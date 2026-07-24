@@ -1,13 +1,23 @@
+# macOS
+.DS_Store
+
 # Python
 __pycache__/
+*.py[cod]
 *.pyc
 backend/venv/
 backend/.venv/
+backend/.pytest_cache/
+backend/.coverage
+
+# Secrets
 backend/.env
+
+# Uploaded files
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-# React
+# Frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.env
@@ -16,13 +26,8 @@ frontend/.env
 .vscode/
 .idea/
 
-# macOS
-.DS_Store
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-
 # Logs
 *.log
+
+# Downloaded archives
+*.zip

@@ -1,0 +1,25 @@
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: skillbeacon-database
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: skillbeacon
+      POSTGRES_USER: skillbeacon
+      POSTGRES_PASSWORD: development_password
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - skillbeacon_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skillbeacon -d skillbeacon"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  skillbeacon_postgres_data:
