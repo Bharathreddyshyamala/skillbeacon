@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+backend/venv/
+backend/.venv/
+backend/.env
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# React
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
