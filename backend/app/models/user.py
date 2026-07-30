@@ -2,16 +2,22 @@ from __future__ import annotations
 
 import enum
 import uuid
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlalchemy import Boolean, Enum as SQLAlchemyEnum, String
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+
 from app.models.base import Base, TimestampMixin
 
 
 if TYPE_CHECKING:
+    from app.models.profile import (
+        EmployerProfile,
+        MentorProfile,
+        StudentProfile,
+    )
     from app.models.refresh_token import RefreshToken
 
 
