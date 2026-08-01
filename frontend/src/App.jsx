@@ -1,0 +1,29 @@
+import { Navigate, Route, Routes } from "react-router";
+
+import ProtectedRoute from "./ProtectedRoute";
+import Layout from "./Layout";
+import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import Register from "./pages/Register";
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/app" element={<Navigate to="/app/dashboard" replace />} />
+          <Route path="/app/dashboard" element={<Dashboard />} />
+          <Route path="/app/profile" element={<Profile />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
