@@ -101,4 +101,6 @@ const API_URL = (
     }
     return payload;
   }
-  
+  export function jsonBody(data) {
+    return JSON.stringify(data);
+  }

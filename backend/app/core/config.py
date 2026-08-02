@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
 
     frontend_url: str = "http://localhost:5173"
+    upload_directory: str = "uploads"
+    max_upload_size_mb: int = 5
 
     model_config = SettingsConfigDict(
         env_file=ENV_FILE_PATH,
@@ -39,6 +41,9 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> List[str]:
         return [self.frontend_url]
+    @property
+    def upload_root(self) -> Path:
+        return BACKEND_DIRECTORY / self.upload_directory
 
 
 @lru_cache
