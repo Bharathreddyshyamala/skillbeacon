@@ -19,6 +19,7 @@ if TYPE_CHECKING:
         StudentProfile,
     )
     from app.models.refresh_token import RefreshToken
+    from app.models.skill import UserSkill
 
 
 class UserRole(str, enum.Enum):
@@ -83,4 +84,32 @@ class User(TimestampMixin, Base):
         back_populates="user",
         cascade="all, delete-orphan",
         passive_deletes=True,
+    )
+    student_profile: Mapped[Optional["StudentProfile"]] = relationship(
+    "StudentProfile",
+    back_populates="user",
+    cascade="all, delete-orphan",
+    passive_deletes=True,
+    uselist=False,
+    )
+
+    employer_profile: Mapped[Optional["EmployerProfile"]] = relationship(
+        "EmployerProfile",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        uselist=False,
+    )
+
+    mentor_profile: Mapped[Optional["MentorProfile"]] = relationship(
+        "MentorProfile",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        uselist=False,
+    )
+    skills: Mapped[List["UserSkill"]] = relationship(
+    back_populates="user",
+    cascade="all, delete-orphan",
+    passive_deletes=True,
     )

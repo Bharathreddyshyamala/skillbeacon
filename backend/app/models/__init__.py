@@ -6,6 +6,23 @@ from app.models.profile import (
     MentorProfile,
     StudentProfile,
 )
+from app.models.skill import (
+    EvidenceType,
+    Skill,
+    SkillEvidence,
+    SkillLevel,
+    SkillVerification,
+    UserSkill,
+    VerificationStatus,
+)
+from app.models.opportunity import (
+    EmploymentType,
+    Opportunity,
+    OpportunitySkill,
+    OpportunityStatus,
+    OpportunityType,
+    WorkMode,
+)
 
 
 __all__ = [

@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class RefreshToken(TimestampMixin, Base):
     """
-    Stores hashed refresh tokens used to generate new access tokens.
+    Stores hashed refresh    tokens used to generate new access tokens.
     """
 
     __tablename__ = "refresh_tokens"
