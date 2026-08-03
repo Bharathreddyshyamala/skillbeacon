@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     )
     from app.models.refresh_token import RefreshToken
     from app.models.skill import UserSkill
+    from app.models.application import Application
 
 
 class UserRole(str, enum.Enum):
@@ -112,4 +113,10 @@ class User(TimestampMixin, Base):
     back_populates="user",
     cascade="all, delete-orphan",
     passive_deletes=True,
+    )
+
+    applications: Mapped[List["Application"]] = relationship(
+        "Application",
+        back_populates="student",
+        foreign_keys="Application.student_id",
     )
