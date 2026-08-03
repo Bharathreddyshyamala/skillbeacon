@@ -1196,7 +1196,7 @@ Check the browser console and Vite terminal for wrong imports, missing exports, 
 - Employer applicant list
 - Status workflow
 - Private notes
-- Protected résumé access
+- Protected resume access
 - Student and employer pages
 
 
