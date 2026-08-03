@@ -40,16 +40,23 @@ import {
       user?.role === "mentor";
   
   
-    // Mentor + Employer + Admin
-    // can review skill evidence.
+    // Mentor + Admin can review
+    // skill evidence.
     const canVerifyEvidence =
       user?.role === "mentor" ||
-      //user?.role === "employer" ||
       user?.role === "admin";
   
   
-    // Only students browse published opportunities.
+    // Only students browse
+    // published opportunities.
     const canBrowseOpportunities =
+      user?.role === "student";
+  
+  
+    // Step 17:
+    // Only students can view and manage
+    // their own applications.
+    const canViewApplications =
       user?.role === "student";
   
   
@@ -170,6 +177,22 @@ import {
   
   
                 {/* =============================================
+                    APPLICATIONS
+                    Step 17
+                    Student only
+                ============================================== */}
+  
+                {canViewApplications && (
+                  <NavLink
+                    className="nav-link"
+                    to="/app/applications"
+                  >
+                    Applications
+                  </NavLink>
+                )}
+  
+  
+                {/* =============================================
                     MANAGE OPPORTUNITIES
                     Employer + Admin only
                 ============================================== */}
@@ -186,7 +209,7 @@ import {
   
                 {/* =============================================
                     VERIFICATIONS
-                    Mentor + Employer + Admin
+                    Mentor + Admin only
                 ============================================== */}
   
                 {canVerifyEvidence && (

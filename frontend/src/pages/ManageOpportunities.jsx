@@ -8,38 +8,41 @@ import {
     jsonBody,
   } from "../api";
   
+  import {
+    useNavigate,
+  } from "react-router";
+  
   
   const EMPTY_FORM = {
-  
     title: "",
-  
     company_name: "",
-  
     description: "",
-  
     location: "",
-  
     work_mode: "hybrid",
-  
     opportunity_type: "internship",
-  
     employment_type: "full_time",
-  
     salary_min: "",
-  
     salary_max: "",
-  
     currency: "USD",
-  
     application_url: "",
-  
     deadline: "",
-  
     status: "draft",
   };
   
   
   export default function ManageOpportunities() {
+  
+    // =========================================================
+    // Navigation
+    // =========================================================
+  
+    const navigate =
+      useNavigate();
+  
+  
+    // =========================================================
+    // Data
+    // =========================================================
   
     const [catalog, setCatalog] =
       useState([]);
@@ -57,11 +60,21 @@ import {
       setRequirements,
     ] = useState([]);
   
+  
+    // =========================================================
+    // Skill Requirement Form
+    // =========================================================
+  
     const [skillId, setSkillId] =
       useState("");
   
     const [skillLevel, setSkillLevel] =
       useState("beginner");
+  
+  
+    // =========================================================
+    // UI State
+    // =========================================================
   
     const [error, setError] =
       useState("");
@@ -69,8 +82,20 @@ import {
     const [message, setMessage] =
       useState("");
   
+    const [loading, setLoading] =
+      useState(true);
+  
+    const [submitting, setSubmitting] =
+      useState(false);
+  
+  
+    // =========================================================
+    // Load Skills + Employer Opportunities
+    // =========================================================
   
     async function loadData() {
+  
+      setLoading(true);
   
       setError("");
   
@@ -118,9 +143,17 @@ import {
           "Unable to load opportunities."
         );
   
+      } finally {
+  
+        setLoading(false);
+  
       }
     }
   
+  
+    // =========================================================
+    // Initial Load
+    // =========================================================
   
     useEffect(() => {
   
@@ -128,6 +161,10 @@ import {
   
     }, []);
   
+  
+    // =========================================================
+    // Update Form Field
+    // =========================================================
   
     function updateField(
       field,
@@ -140,9 +177,12 @@ import {
         [field]:
           value,
       });
-  
     }
   
+  
+    // =========================================================
+    // Add Required Skill
+    // =========================================================
   
     function addRequirement() {
   
@@ -167,6 +207,11 @@ import {
   
   
       if (!selected) {
+  
+        setError(
+          "Selected skill was not found."
+        );
+  
         return;
       }
   
@@ -216,6 +261,10 @@ import {
     }
   
   
+    // =========================================================
+    // Remove Required Skill
+    // =========================================================
+  
     function removeRequirement(
       skillIdToRemove,
     ) {
@@ -230,6 +279,10 @@ import {
     }
   
   
+    // =========================================================
+    // Create Opportunity
+    // =========================================================
+  
     async function createOpportunity(
       event,
     ) {
@@ -238,6 +291,8 @@ import {
   
       setError("");
       setMessage("");
+  
+      setSubmitting(true);
   
   
       try {
@@ -315,6 +370,13 @@ import {
         );
   
   
+        setSkillId("");
+  
+        setSkillLevel(
+          "beginner"
+        );
+  
+  
         await loadData();
   
   
@@ -325,9 +387,17 @@ import {
           "Unable to create opportunity."
         );
   
+      } finally {
+  
+        setSubmitting(false);
+  
       }
     }
   
+  
+    // =========================================================
+    // Change Opportunity Status
+    // =========================================================
   
     async function changeStatus(
       opportunityId,
@@ -367,13 +437,35 @@ import {
           requestError.message ||
           "Unable to update opportunity."
         );
-  
       }
     }
   
   
+    // =========================================================
+    // STEP 17.16
+    // Open Applicants Page
+    // =========================================================
+  
+    function viewApplicants(
+      opportunityId,
+    ) {
+  
+      navigate(
+        `/app/opportunities/${opportunityId}/applicants`
+      );
+    }
+  
+  
+    // =========================================================
+    // UI
+    // =========================================================
+  
     return (
       <>
+  
+        {/* =====================================================
+            PAGE HEADER
+        ====================================================== */}
   
         <div className="mb-4">
   
@@ -381,17 +473,24 @@ import {
             Employer
           </p>
   
+  
           <h1 className="display-6 fw-bold">
             Manage Opportunities
           </h1>
   
+  
           <p className="text-secondary">
-            Create opportunities and define
-            the skills candidates should have.
+            Create opportunities, define
+            required skills, and review
+            applicants.
           </p>
   
         </div>
   
+  
+        {/* =====================================================
+            ERROR
+        ====================================================== */}
   
         {error && (
   
@@ -402,6 +501,10 @@ import {
         )}
   
   
+        {/* =====================================================
+            SUCCESS MESSAGE
+        ====================================================== */}
+  
         {message && (
   
           <div className="alert alert-success">
@@ -410,6 +513,10 @@ import {
   
         )}
   
+  
+        {/* =====================================================
+            CREATE OPPORTUNITY
+        ====================================================== */}
   
         <div className="glass-card mb-5">
   
@@ -426,6 +533,8 @@ import {
   
             <div className="row g-3">
   
+  
+              {/* Title */}
   
               <div className="col-md-6">
   
@@ -450,6 +559,8 @@ import {
               </div>
   
   
+              {/* Company */}
+  
               <div className="col-md-6">
   
                 <label className="form-label">
@@ -472,6 +583,8 @@ import {
   
               </div>
   
+  
+              {/* Description */}
   
               <div className="col-12">
   
@@ -496,6 +609,8 @@ import {
   
               </div>
   
+  
+              {/* Opportunity Type */}
   
               <div className="col-md-4">
   
@@ -537,6 +652,8 @@ import {
               </div>
   
   
+              {/* Work Mode */}
+  
               <div className="col-md-4">
   
                 <label className="form-label">
@@ -572,6 +689,8 @@ import {
   
               </div>
   
+  
+              {/* Employment Type */}
   
               <div className="col-md-4">
   
@@ -613,6 +732,8 @@ import {
               </div>
   
   
+              {/* Location */}
+  
               <div className="col-md-6">
   
                 <label className="form-label">
@@ -634,6 +755,8 @@ import {
   
               </div>
   
+  
+              {/* Deadline */}
   
               <div className="col-md-6">
   
@@ -657,6 +780,8 @@ import {
   
               </div>
   
+  
+              {/* Salary Min */}
   
               <div className="col-md-6">
   
@@ -682,6 +807,8 @@ import {
               </div>
   
   
+              {/* Salary Max */}
+  
               <div className="col-md-6">
   
                 <label className="form-label">
@@ -706,6 +833,8 @@ import {
               </div>
   
   
+              {/* External URL */}
+  
               <div className="col-12">
   
                 <label className="form-label">
@@ -725,13 +854,21 @@ import {
                     )
                   }
                 />
-                
-              
+  
+                <div className="form-text">
+                  Optional. Students can also
+                  apply directly through
+                  SkillBeacon.
+                </div>
   
               </div>
   
             </div>
   
+  
+            {/* =================================================
+                REQUIRED SKILLS
+            ================================================== */}
   
             <hr className="my-4" />
   
@@ -742,6 +879,8 @@ import {
   
   
             <div className="row g-3">
+  
+              {/* Skill */}
   
               <div className="col-md-6">
   
@@ -779,6 +918,8 @@ import {
               </div>
   
   
+              {/* Skill Level */}
+  
               <div className="col-md-4">
   
                 <select
@@ -814,6 +955,8 @@ import {
               </div>
   
   
+              {/* Add Skill */}
+  
               <div className="col-md-2">
   
                 <button
@@ -830,6 +973,8 @@ import {
   
             </div>
   
+  
+            {/* Added Skill Requirements */}
   
             <div className="mt-3 d-flex flex-wrap gap-2">
   
@@ -869,6 +1014,10 @@ import {
             </div>
   
   
+            {/* =================================================
+                INITIAL STATUS
+            ================================================== */}
+  
             <div className="mt-4">
   
               <label className="form-label">
@@ -904,11 +1053,22 @@ import {
             </div>
   
   
+            {/* Submit */}
+  
             <button
               type="submit"
               className="btn btn-info mt-4"
+              disabled={
+                submitting
+              }
             >
-              Create Opportunity
+  
+              {
+                submitting
+                  ? "Creating..."
+                  : "Create Opportunity"
+              }
+  
             </button>
   
           </form>
@@ -916,12 +1076,48 @@ import {
         </div>
   
   
-        <h2 className="h4 mb-3">
-          My Opportunities
-        </h2>
+        {/* =====================================================
+            MY OPPORTUNITIES
+        ====================================================== */}
   
+        <div className="d-flex justify-content-between align-items-center mb-3">
+  
+          <h2 className="h4 mb-0">
+            My Opportunities
+          </h2>
+  
+          <span className="text-secondary small">
+  
+            {
+              items.length
+            }{" "}
+  
+            {
+              items.length === 1
+                ? "opportunity"
+                : "opportunities"
+            }
+  
+          </span>
+  
+        </div>
+  
+  
+        {/* Loading */}
+  
+        {loading && (
+  
+          <p className="text-secondary">
+            Loading opportunities...
+          </p>
+  
+        )}
+  
+  
+        {/* Empty */}
   
         {
+          !loading &&
           items.length === 0 && (
   
             <div className="glass-card">
@@ -937,84 +1133,301 @@ import {
         }
   
   
-        {items.map(
-          (item) => (
+        {/* Opportunity Cards */}
   
-            <div
-              key={item.id}
-              className="glass-card mb-3"
-            >
+        {
+          !loading &&
+          items.map(
+            (item) => (
   
-              <div className="d-flex justify-content-between align-items-start gap-3">
+              <div
+                key={item.id}
+                className="glass-card mb-3"
+              >
   
-                <div>
+                <div className="d-flex justify-content-between align-items-start gap-3 flex-wrap">
   
-                  <h3 className="h5">
-                    {item.title}
-                  </h3>
+                  {/* -------------------------------------------
+                      Opportunity Information
+                  -------------------------------------------- */}
   
-                  <p className="text-secondary mb-2">
-                    {item.company_name}
-                  </p>
+                  <div>
   
-                  <span className="badge text-bg-secondary text-capitalize">
-                    {item.status}
-                  </span>
+                    <p className="text-info text-uppercase small mb-1">
+  
+                      {
+                        item.opportunity_type
+                      }
+  
+                    </p>
+  
+  
+                    <h3 className="h5 mb-1">
+  
+                      {item.title}
+  
+                    </h3>
+  
+  
+                    <p className="text-secondary mb-2">
+  
+                      {
+                        item.company_name
+                      }
+  
+                    </p>
+  
+  
+                    <div className="d-flex flex-wrap gap-2">
+  
+                      <span className="badge text-bg-secondary text-capitalize">
+  
+                        {item.status}
+  
+                      </span>
+  
+  
+                      {
+                        item.work_mode && (
+  
+                          <span className="badge text-bg-info text-capitalize">
+  
+                            {
+                              item.work_mode
+                            }
+  
+                          </span>
+  
+                        )
+                      }
+  
+                    </div>
+  
+                  </div>
+  
+  
+                  {/* -------------------------------------------
+                      Opportunity Actions
+                  -------------------------------------------- */}
+  
+                  <div className="d-flex gap-2 flex-wrap">
+  
+  
+                    {/* =========================================
+                        STEP 17.16
+                        VIEW APPLICANTS
+                    ========================================== */}
+  
+                    <button
+                      type="button"
+                      className="btn btn-outline-info btn-sm"
+                      onClick={() =>
+                        viewApplicants(
+                          item.id
+                        )
+                      }
+                    >
+                      View Applicants
+                    </button>
+  
+  
+                    {/* Publish */}
+  
+                    {
+                      item.status !== "open" &&
+                      item.status !== "closed" && (
+  
+                        <button
+                          type="button"
+                          className="btn btn-success btn-sm"
+                          onClick={() =>
+                            changeStatus(
+                              item.id,
+                              "open"
+                            )
+                          }
+                        >
+                          Publish
+                        </button>
+  
+                      )
+                    }
+  
+  
+                    {/* Re-open a closed opportunity */}
+  
+                    {
+                      item.status === "closed" && (
+  
+                        <button
+                          type="button"
+                          className="btn btn-success btn-sm"
+                          onClick={() =>
+                            changeStatus(
+                              item.id,
+                              "open"
+                            )
+                          }
+                        >
+                          Reopen
+                        </button>
+  
+                      )
+                    }
+  
+  
+                    {/* Close */}
+  
+                    {
+                      item.status === "open" && (
+  
+                        <button
+                          type="button"
+                          className="btn btn-outline-warning btn-sm"
+                          onClick={() =>
+                            changeStatus(
+                              item.id,
+                              "closed"
+                            )
+                          }
+                        >
+                          Close
+                        </button>
+  
+                      )
+                    }
+  
+                  </div>
   
                 </div>
   
   
-                <div className="d-flex gap-2">
+                {/* ---------------------------------------------
+                    Additional Opportunity Information
+                ---------------------------------------------- */}
+  
+                <div className="row mt-4 small">
+  
+                  <div className="col-md-4">
+  
+                    <span className="text-secondary">
+                      Location
+                    </span>
+  
+                    <div>
+                      {
+                        item.location ||
+                        "Not specified"
+                      }
+                    </div>
+  
+                  </div>
   
   
-                  {
-                    item.status !== "open" && (
+                  <div className="col-md-4">
   
-                      <button
-                        type="button"
-                        className="btn btn-success btn-sm"
-                        onClick={() =>
-                          changeStatus(
-                            item.id,
-                            "open"
+                    <span className="text-secondary">
+                      Deadline
+                    </span>
+  
+                    <div>
+                      {
+                        item.deadline ||
+                        "No deadline"
+                      }
+                    </div>
+  
+                  </div>
+  
+  
+                  <div className="col-md-4">
+  
+                    <span className="text-secondary">
+                      Employment
+                    </span>
+  
+                    <div className="text-capitalize">
+  
+                      {
+                        item.employment_type
+                          ?.replaceAll(
+                            "_",
+                            " "
                           )
-                        }
-                      >
-                        Publish
-                      </button>
+                        || "Not specified"
+                      }
   
-                    )
-                  }
+                    </div>
   
-  
-                  {
-                    item.status === "open" && (
-  
-                      <button
-                        type="button"
-                        className="btn btn-outline-warning btn-sm"
-                        onClick={() =>
-                          changeStatus(
-                            item.id,
-                            "closed"
-                          )
-                        }
-                      >
-                        Close
-                      </button>
-  
-                    )
-                  }
-  
+                  </div>
   
                 </div>
+  
+  
+                {/* Required Skills */}
+  
+                {
+                  (
+                    item.skills
+                    || []
+                  ).length > 0 && (
+  
+                    <div className="mt-3">
+  
+                      <h4 className="h6">
+                        Required Skills
+                      </h4>
+  
+  
+                      <div className="d-flex flex-wrap gap-2">
+  
+                        {
+                          (
+                            item.skills
+                            || []
+                          ).map(
+                            (
+                              requirement
+                            ) => (
+  
+                              <span
+                                key={
+                                  requirement.id
+                                }
+                                className="badge rounded-pill text-bg-secondary"
+                              >
+  
+                                {
+                                  requirement
+                                    .skill
+                                    ?.name
+                                }
+  
+                                {" · "}
+  
+                                {
+                                  requirement
+                                    .minimum_level
+                                }
+  
+                              </span>
+  
+                            )
+                          )
+                        }
+  
+                      </div>
+  
+                    </div>
+  
+                  )
+                }
   
               </div>
   
-            </div>
-  
+            )
           )
-        )}
+        }
   
       </>
     );

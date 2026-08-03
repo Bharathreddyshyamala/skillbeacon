@@ -23,6 +23,10 @@ from app.models.opportunity import (
     OpportunityType,
     WorkMode,
 )
+from app.models.application import (
+    Application,
+    ApplicationStatus,
+)
 
 
 __all__ = [

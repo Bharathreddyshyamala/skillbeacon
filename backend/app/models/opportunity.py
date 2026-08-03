@@ -183,6 +183,11 @@ class Opportunity(Base):
         passive_deletes=True,
         lazy="selectin",
     )
+    applications = relationship(
+    "Application",
+    back_populates="opportunity",
+    passive_deletes=True,
+    )
 
 
 # ============================================================
