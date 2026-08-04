@@ -65,7 +65,10 @@ import {
     const canManageOpportunities =
       user?.role === "employer" ||
       user?.role === "admin";
-  
+    
+    const canUseMentorships =
+      user?.role === "student" ||
+      user?.role === "mentor";
   
     return (
       <div className="app-shell">
@@ -178,7 +181,7 @@ import {
   
                 {/* =============================================
                     APPLICATIONS
-                    Step 17
+        
                     Student only
                 ============================================== */}
   
@@ -189,6 +192,16 @@ import {
                   >
                     Applications
                   </NavLink>
+                )}
+                {/* MENTORSHIPS */}
+
+                {canUseMentorships && (
+                <NavLink
+                    className="nav-link"
+                    to="/app/mentorships"
+                >
+                    Mentorship
+                </NavLink>
                 )}
   
   

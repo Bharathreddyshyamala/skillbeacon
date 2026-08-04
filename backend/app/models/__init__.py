@@ -27,6 +27,12 @@ from app.models.application import (
     Application,
     ApplicationStatus,
 )
+from app.models.mentorship import (
+    Mentorship,
+    MentorshipSession,
+    MentorshipSessionStatus,
+    MentorshipStatus,
+)
 
 
 __all__ = [

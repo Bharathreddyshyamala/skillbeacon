@@ -120,3 +120,14 @@ class User(TimestampMixin, Base):
         back_populates="student",
         foreign_keys="Application.student_id",
     )
+    student_mentorships = relationship(
+    "Mentorship",
+    foreign_keys="Mentorship.student_id",
+    back_populates="student",
+)
+
+    mentor_mentorships = relationship(
+        "Mentorship",
+        foreign_keys="Mentorship.mentor_id",
+        back_populates="mentor",
+    )

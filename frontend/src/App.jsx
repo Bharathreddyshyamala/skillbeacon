@@ -13,6 +13,7 @@ import Opportunities from "./pages/Opportunities";
 import ManageOpportunities from "./pages/ManageOpportunities";
 import Applications from "./pages/Applications";
 import OpportunityApplicants from "./pages/OpportunityApplicants";
+import Mentorships from "./pages/Mentorships";
 export default function App() {
   return (
     <Routes>
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/app/opportunities/manage" element={<ManageOpportunities />}/>
           <Route path="/app/applications" element={<Applications />}/>
           <Route path="/app/opportunities/:opportunityId/applicants" element={<OpportunityApplicants />}/>
+          <Route path="/app/mentorships" element={<Mentorships />}/>
 
         </Route>
       </Route>
