@@ -19,9 +19,6 @@ from app.models.application import (
 )
 
 
-# ============================================================
-# Student create
-# ============================================================
 
 
 class ApplicationCreateRequest(BaseModel):
@@ -34,9 +31,6 @@ class ApplicationCreateRequest(BaseModel):
     )
 
 
-# ============================================================
-# Employer status update
-# ============================================================
 
 
 class ApplicationStatusRequest(BaseModel):
@@ -49,9 +43,6 @@ class ApplicationStatusRequest(BaseModel):
     )
 
 
-# ============================================================
-# Employer note enhancement
-# ============================================================
 
 
 class ApplicationNoteRequest(BaseModel):
@@ -62,11 +53,6 @@ class ApplicationNoteRequest(BaseModel):
     )
 
 
-# ============================================================
-# Student response
-# Never expose employer_note.
-# Never expose resume_path.
-# ============================================================
 
 
 class StudentApplicationResponse(BaseModel):
@@ -105,9 +91,6 @@ class StudentApplicationListResponse(BaseModel):
     offset: int
 
 
-# ============================================================
-# Employer response
-# ============================================================
 
 
 class EmployerApplicationResponse(BaseModel):

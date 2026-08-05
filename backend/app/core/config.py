@@ -5,11 +5,6 @@ from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-# config.py is located at:
-# backend/app/core/config.py
-#
-# parents[2] points to:
-# backend/
 BACKEND_DIRECTORY = Path(__file__).resolve().parents[2]
 
 ENV_FILE_PATH = BACKEND_DIRECTORY / ".env"

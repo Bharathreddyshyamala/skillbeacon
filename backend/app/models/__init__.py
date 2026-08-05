@@ -27,6 +27,22 @@ from app.models.application import (
     Application,
     ApplicationStatus,
 )
+from app.models.mentorship import (
+    Mentorship,
+    MentorshipSession,
+    MentorshipSessionStatus,
+    MentorshipStatus,
+)
+from app.models.challenge import (
+    Challenge,
+    ChallengeDifficulty,
+    ChallengeSkill,
+    ChallengeSkillLevel,
+    ChallengeStatus,
+    ChallengeSubmission,
+    ChallengeSubmissionStatus,
+    ChallengeType,
+)
 
 
 __all__ = [

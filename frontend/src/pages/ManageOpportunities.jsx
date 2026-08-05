@@ -32,17 +32,11 @@ import {
   
   export default function ManageOpportunities() {
   
-    // =========================================================
-    // Navigation
-    // =========================================================
   
     const navigate =
       useNavigate();
   
   
-    // =========================================================
-    // Data
-    // =========================================================
   
     const [catalog, setCatalog] =
       useState([]);
@@ -61,9 +55,6 @@ import {
     ] = useState([]);
   
   
-    // =========================================================
-    // Skill Requirement Form
-    // =========================================================
   
     const [skillId, setSkillId] =
       useState("");
@@ -72,9 +63,6 @@ import {
       useState("beginner");
   
   
-    // =========================================================
-    // UI State
-    // =========================================================
   
     const [error, setError] =
       useState("");
@@ -89,9 +77,6 @@ import {
       useState(false);
   
   
-    // =========================================================
-    // Load Skills + Employer Opportunities
-    // =========================================================
   
     async function loadData() {
   
@@ -151,9 +136,6 @@ import {
     }
   
   
-    // =========================================================
-    // Initial Load
-    // =========================================================
   
     useEffect(() => {
   
@@ -162,9 +144,6 @@ import {
     }, []);
   
   
-    // =========================================================
-    // Update Form Field
-    // =========================================================
   
     function updateField(
       field,
@@ -180,9 +159,6 @@ import {
     }
   
   
-    // =========================================================
-    // Add Required Skill
-    // =========================================================
   
     function addRequirement() {
   
@@ -261,9 +237,6 @@ import {
     }
   
   
-    // =========================================================
-    // Remove Required Skill
-    // =========================================================
   
     function removeRequirement(
       skillIdToRemove,
@@ -279,9 +252,6 @@ import {
     }
   
   
-    // =========================================================
-    // Create Opportunity
-    // =========================================================
   
     async function createOpportunity(
       event,
@@ -395,9 +365,6 @@ import {
     }
   
   
-    // =========================================================
-    // Change Opportunity Status
-    // =========================================================
   
     async function changeStatus(
       opportunityId,
@@ -441,10 +408,6 @@ import {
     }
   
   
-    // =========================================================
-    // STEP 17.16
-    // Open Applicants Page
-    // =========================================================
   
     function viewApplicants(
       opportunityId,
@@ -456,16 +419,10 @@ import {
     }
   
   
-    // =========================================================
-    // UI
-    // =========================================================
   
     return (
       <>
   
-        {/* =====================================================
-            PAGE HEADER
-        ====================================================== */}
   
         <div className="mb-4">
   
@@ -488,9 +445,6 @@ import {
         </div>
   
   
-        {/* =====================================================
-            ERROR
-        ====================================================== */}
   
         {error && (
   
@@ -501,9 +455,6 @@ import {
         )}
   
   
-        {/* =====================================================
-            SUCCESS MESSAGE
-        ====================================================== */}
   
         {message && (
   
@@ -514,9 +465,6 @@ import {
         )}
   
   
-        {/* =====================================================
-            CREATE OPPORTUNITY
-        ====================================================== */}
   
         <div className="glass-card mb-5">
   
@@ -534,7 +482,6 @@ import {
             <div className="row g-3">
   
   
-              {/* Title */}
   
               <div className="col-md-6">
   
@@ -559,7 +506,6 @@ import {
               </div>
   
   
-              {/* Company */}
   
               <div className="col-md-6">
   
@@ -584,7 +530,6 @@ import {
               </div>
   
   
-              {/* Description */}
   
               <div className="col-12">
   
@@ -610,7 +555,6 @@ import {
               </div>
   
   
-              {/* Opportunity Type */}
   
               <div className="col-md-4">
   
@@ -652,7 +596,6 @@ import {
               </div>
   
   
-              {/* Work Mode */}
   
               <div className="col-md-4">
   
@@ -690,7 +633,6 @@ import {
               </div>
   
   
-              {/* Employment Type */}
   
               <div className="col-md-4">
   
@@ -732,7 +674,6 @@ import {
               </div>
   
   
-              {/* Location */}
   
               <div className="col-md-6">
   
@@ -756,7 +697,6 @@ import {
               </div>
   
   
-              {/* Deadline */}
   
               <div className="col-md-6">
   
@@ -781,7 +721,6 @@ import {
               </div>
   
   
-              {/* Salary Min */}
   
               <div className="col-md-6">
   
@@ -807,7 +746,6 @@ import {
               </div>
   
   
-              {/* Salary Max */}
   
               <div className="col-md-6">
   
@@ -833,7 +771,6 @@ import {
               </div>
   
   
-              {/* External URL */}
   
               <div className="col-12">
   
@@ -866,9 +803,6 @@ import {
             </div>
   
   
-            {/* =================================================
-                REQUIRED SKILLS
-            ================================================== */}
   
             <hr className="my-4" />
   
@@ -880,7 +814,6 @@ import {
   
             <div className="row g-3">
   
-              {/* Skill */}
   
               <div className="col-md-6">
   
@@ -918,7 +851,6 @@ import {
               </div>
   
   
-              {/* Skill Level */}
   
               <div className="col-md-4">
   
@@ -955,7 +887,6 @@ import {
               </div>
   
   
-              {/* Add Skill */}
   
               <div className="col-md-2">
   
@@ -974,7 +905,6 @@ import {
             </div>
   
   
-            {/* Added Skill Requirements */}
   
             <div className="mt-3 d-flex flex-wrap gap-2">
   
@@ -1014,9 +944,6 @@ import {
             </div>
   
   
-            {/* =================================================
-                INITIAL STATUS
-            ================================================== */}
   
             <div className="mt-4">
   
@@ -1053,7 +980,6 @@ import {
             </div>
   
   
-            {/* Submit */}
   
             <button
               type="submit"
@@ -1076,9 +1002,6 @@ import {
         </div>
   
   
-        {/* =====================================================
-            MY OPPORTUNITIES
-        ====================================================== */}
   
         <div className="d-flex justify-content-between align-items-center mb-3">
   
@@ -1103,7 +1026,6 @@ import {
         </div>
   
   
-        {/* Loading */}
   
         {loading && (
   
@@ -1114,7 +1036,6 @@ import {
         )}
   
   
-        {/* Empty */}
   
         {
           !loading &&
@@ -1133,7 +1054,6 @@ import {
         }
   
   
-        {/* Opportunity Cards */}
   
         {
           !loading &&
@@ -1147,9 +1067,6 @@ import {
   
                 <div className="d-flex justify-content-between align-items-start gap-3 flex-wrap">
   
-                  {/* -------------------------------------------
-                      Opportunity Information
-                  -------------------------------------------- */}
   
                   <div>
   
@@ -1206,17 +1123,10 @@ import {
                   </div>
   
   
-                  {/* -------------------------------------------
-                      Opportunity Actions
-                  -------------------------------------------- */}
   
                   <div className="d-flex gap-2 flex-wrap">
   
   
-                    {/* =========================================
-                        STEP 17.16
-                        VIEW APPLICANTS
-                    ========================================== */}
   
                     <button
                       type="button"
@@ -1231,7 +1141,6 @@ import {
                     </button>
   
   
-                    {/* Publish */}
   
                     {
                       item.status !== "open" &&
@@ -1254,7 +1163,6 @@ import {
                     }
   
   
-                    {/* Re-open a closed opportunity */}
   
                     {
                       item.status === "closed" && (
@@ -1276,7 +1184,6 @@ import {
                     }
   
   
-                    {/* Close */}
   
                     {
                       item.status === "open" && (
@@ -1302,9 +1209,6 @@ import {
                 </div>
   
   
-                {/* ---------------------------------------------
-                    Additional Opportunity Information
-                ---------------------------------------------- */}
   
                 <div className="row mt-4 small">
   
@@ -1364,7 +1268,6 @@ import {
                 </div>
   
   
-                {/* Required Skills */}
   
                 {
                   (

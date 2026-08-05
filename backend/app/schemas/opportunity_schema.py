@@ -29,9 +29,6 @@ from app.schemas.skill_schema import (
 )
 
 
-# ============================================================
-# Opportunity Skill Request
-# ============================================================
 
 
 class OpportunitySkillRequest(BaseModel):
@@ -45,9 +42,6 @@ class OpportunitySkillRequest(BaseModel):
     required: bool = True
 
 
-# ============================================================
-# Opportunity Skill Response
-# ============================================================
 
 
 class OpportunitySkillResponse(BaseModel):
@@ -67,9 +61,6 @@ class OpportunitySkillResponse(BaseModel):
     skill: SkillResponse
 
 
-# ============================================================
-# Create Opportunity
-# ============================================================
 
 
 class OpportunityCreateRequest(BaseModel):
@@ -132,9 +123,6 @@ class OpportunityCreateRequest(BaseModel):
     )
 
 
-# ============================================================
-# Update Opportunity
-# ============================================================
 
 
 class OpportunityUpdateRequest(BaseModel):
@@ -189,9 +177,6 @@ class OpportunityUpdateRequest(BaseModel):
     ] = None
 
 
-# ============================================================
-# Status Request
-# ============================================================
 
 
 class OpportunityStatusRequest(BaseModel):
@@ -199,9 +184,6 @@ class OpportunityStatusRequest(BaseModel):
     status: OpportunityStatus
 
 
-# ============================================================
-# Opportunity Response
-# ============================================================
 
 
 class OpportunityResponse(BaseModel):

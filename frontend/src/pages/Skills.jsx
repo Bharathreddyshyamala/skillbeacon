@@ -8,19 +8,12 @@ import {
 
 export default function Skills() {
 
-  // ---------------------------------------
-  // Skill catalog from backend
-  // ---------------------------------------
 
   const [catalog, setCatalog] = useState([]);
 
-  // Skills added by logged-in user
   const [mySkills, setMySkills] = useState([]);
 
 
-  // ---------------------------------------
-  // Add Skill form
-  // ---------------------------------------
 
   const [selectedSkill, setSelectedSkill] =
     useState("");
@@ -29,9 +22,6 @@ export default function Skills() {
     useState("beginner");
 
 
-  // ---------------------------------------
-  // Messages
-  // ---------------------------------------
 
   const [error, setError] =
     useState("");
@@ -40,12 +30,7 @@ export default function Skills() {
     useState("");
 
 
-  // ---------------------------------------
-  // Evidence form
-  // ---------------------------------------
 
-  // Stores the UserSkill ID for which
-  // the evidence form is currently open
   const [evidenceSkillId, setEvidenceSkillId] =
     useState("");
 
@@ -59,9 +44,6 @@ export default function Skills() {
     });
 
 
-  // ---------------------------------------
-  // Load catalog + user's skills
-  // ---------------------------------------
 
   async function loadData() {
 
@@ -107,9 +89,6 @@ export default function Skills() {
   }, []);
 
 
-  // ---------------------------------------
-  // Add Skill
-  // ---------------------------------------
 
   async function addSkill(event) {
 
@@ -147,12 +126,10 @@ export default function Skills() {
       );
 
 
-      // Reset form
       setSelectedSkill("");
       setLevel("beginner");
 
 
-      // Reload skills
       await loadData();
 
     } catch (requestError) {
@@ -166,9 +143,6 @@ export default function Skills() {
   }
 
 
-  // ---------------------------------------
-  // Delete Skill
-  // ---------------------------------------
 
   async function deleteSkill(userSkillId) {
 
@@ -214,9 +188,6 @@ export default function Skills() {
   }
 
 
-  // ---------------------------------------
-  // Open Evidence form
-  // ---------------------------------------
 
   function openEvidenceForm(userSkillId) {
 
@@ -224,8 +195,6 @@ export default function Skills() {
     setMessage("");
 
 
-    // If same form is already open,
-    // clicking button again closes it
     if (evidenceSkillId === userSkillId) {
 
       setEvidenceSkillId("");
@@ -237,7 +206,6 @@ export default function Skills() {
     setEvidenceSkillId(userSkillId);
 
 
-    // Reset form
     setEvidence({
       evidence_type: "github_project",
       title: "",
@@ -247,9 +215,6 @@ export default function Skills() {
   }
 
 
-  // ---------------------------------------
-  // Cancel Evidence form
-  // ---------------------------------------
 
   function cancelEvidenceForm() {
 
@@ -265,9 +230,6 @@ export default function Skills() {
   }
 
 
-  // ---------------------------------------
-  // Add Evidence
-  // ---------------------------------------
 
   async function addEvidence(event) {
 
@@ -332,7 +294,6 @@ export default function Skills() {
       );
 
 
-      // Reset evidence form
       setEvidenceSkillId("");
 
 
@@ -344,7 +305,6 @@ export default function Skills() {
       });
 
 
-      // Reload skill data
       await loadData();
 
     } catch (requestError) {
@@ -358,9 +318,6 @@ export default function Skills() {
   }
 
 
-  // ---------------------------------------
-  // Evidence Status Badge
-  // ---------------------------------------
 
   function getEvidenceBadge(status) {
 
@@ -392,14 +349,10 @@ export default function Skills() {
   }
 
 
-  // ---------------------------------------
-  // UI
-  // ---------------------------------------
 
   return (
     <>
 
-      {/* PAGE TITLE */}
 
       <div className="mb-4">
 
@@ -422,7 +375,6 @@ export default function Skills() {
       </div>
 
 
-      {/* ERROR MESSAGE */}
 
       {error && (
 
@@ -436,7 +388,6 @@ export default function Skills() {
       )}
 
 
-      {/* SUCCESS MESSAGE */}
 
       {message && (
 
@@ -453,9 +404,6 @@ export default function Skills() {
       <div className="row g-4">
 
 
-        {/* -------------------------------- */}
-        {/* LEFT SIDE - ADD SKILL */}
-        {/* -------------------------------- */}
 
         <div className="col-lg-4">
 
@@ -469,7 +417,6 @@ export default function Skills() {
             <form onSubmit={addSkill}>
 
 
-              {/* Skill */}
 
               <div className="mb-3">
 
@@ -515,7 +462,6 @@ export default function Skills() {
               </div>
 
 
-              {/* Level */}
 
               <div className="mb-3">
 
@@ -585,14 +531,10 @@ export default function Skills() {
         </div>
 
 
-        {/* -------------------------------- */}
-        {/* RIGHT SIDE - SKILL PASSPORT */}
-        {/* -------------------------------- */}
 
         <div className="col-lg-8">
 
 
-          {/* No Skills */}
 
           {mySkills.length === 0 && (
 
@@ -609,12 +551,10 @@ export default function Skills() {
           )}
 
 
-          {/* Skill Cards */}
 
           {mySkills.map(
             (userSkill) => {
 
-              // Prevent errors if evidence is null
               const skillEvidence =
                 Array.isArray(userSkill.evidence)
                   ? userSkill.evidence
@@ -629,7 +569,6 @@ export default function Skills() {
                 >
 
 
-                  {/* Skill Header */}
 
                   <div className="d-flex justify-content-between align-items-start gap-3">
 
@@ -670,9 +609,6 @@ export default function Skills() {
                   </div>
 
 
-                  {/* -------------------------------- */}
-                  {/* Confidence */}
-                  {/* -------------------------------- */}
 
                   <div className="mt-4">
 
@@ -732,9 +668,6 @@ export default function Skills() {
                   </div>
 
 
-                  {/* -------------------------------- */}
-                  {/* Evidence Header */}
-                  {/* -------------------------------- */}
 
                   <div className="mt-4">
 
@@ -772,9 +705,6 @@ export default function Skills() {
                     </div>
 
 
-                    {/* -------------------------------- */}
-                    {/* Existing Evidence */}
-                    {/* -------------------------------- */}
 
                     {skillEvidence.length === 0 ? (
 
@@ -833,7 +763,6 @@ export default function Skills() {
                             </div>
 
 
-                            {/* Description */}
 
                             {item.description && (
 
@@ -848,7 +777,6 @@ export default function Skills() {
                             )}
 
 
-                            {/* Evidence URL */}
 
                             {item.url && (
 
@@ -866,7 +794,6 @@ export default function Skills() {
                             )}
 
 
-                            {/* Verification count */}
 
                             {
                               Array.isArray(
@@ -906,9 +833,6 @@ export default function Skills() {
                     )}
 
 
-                    {/* -------------------------------- */}
-                    {/* Add Evidence Form */}
-                    {/* -------------------------------- */}
 
                     {
                       evidenceSkillId
@@ -927,7 +851,6 @@ export default function Skills() {
                           </h4>
 
 
-                          {/* Evidence Type */}
 
                           <div className="mb-3">
 
@@ -1013,7 +936,6 @@ export default function Skills() {
                           </div>
 
 
-                          {/* Title */}
 
                           <div className="mb-3">
 
@@ -1049,7 +971,6 @@ export default function Skills() {
                           </div>
 
 
-                          {/* Description */}
 
                           <div className="mb-3">
 
@@ -1085,7 +1006,6 @@ export default function Skills() {
                           </div>
 
 
-                          {/* URL */}
 
                           <div className="mb-3">
 
@@ -1131,7 +1051,6 @@ export default function Skills() {
                           </div>
 
 
-                          {/* Buttons */}
 
                           <div className="d-flex gap-2">
 

@@ -9,7 +9,6 @@ from app.schemas.auth_schema import UserResponse
 
 
 class ProfileUpdateRequest(BaseModel):
-    # Student fields
     first_name: Optional[str] = Field(default=None, max_length=100)
     last_name: Optional[str] = Field(default=None, max_length=100)
     headline: Optional[str] = Field(default=None, max_length=200)
@@ -25,7 +24,6 @@ class ProfileUpdateRequest(BaseModel):
     linkedin_url: Optional[str] = Field(default=None, max_length=500)
     portfolio_url: Optional[str] = Field(default=None, max_length=500)
 
-    # Employer fields
     company_name: Optional[str] = Field(default=None, max_length=200)
     industry: Optional[str] = Field(default=None, max_length=150)
     company_size: Optional[str] = Field(default=None, max_length=100)
@@ -33,7 +31,6 @@ class ProfileUpdateRequest(BaseModel):
     description: Optional[str] = None
     location: Optional[str] = Field(default=None, max_length=250)
 
-    # Mentor fields
     display_name: Optional[str] = Field(default=None, max_length=200)
     bio: Optional[str] = None
     years_of_experience: Optional[int] = Field(default=None, ge=0, le=80)
@@ -41,7 +38,6 @@ class ProfileUpdateRequest(BaseModel):
     mentorship_formats: Optional[List[str]] = None
     is_accepting_requests: Optional[bool] = None
 
-    # Shared field
     is_public: Optional[bool] = None
 
     @field_validator(

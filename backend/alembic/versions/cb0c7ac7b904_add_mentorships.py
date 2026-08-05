@@ -1,0 +1,77 @@
+"""add mentorships
+
+Revision ID: cb0c7ac7b904
+Revises: 6a70d7f5d205
+Create Date: 2026-08-03 06:26:56.015224
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+
+
+revision: str = 'cb0c7ac7b904'
+down_revision: Union[str, Sequence[str], None] = '6a70d7f5d205'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    """Upgrade schema."""
+    op.create_table('mentorships',
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('student_id', sa.UUID(), nullable=False),
+    sa.Column('mentor_id', sa.UUID(), nullable=False),
+    sa.Column('focus_area', sa.String(length=200), nullable=False),
+    sa.Column('goals', sa.Text(), nullable=False),
+    sa.Column('message', sa.Text(), nullable=True),
+    sa.Column('mentor_response', sa.Text(), nullable=True),
+    sa.Column('status', sa.Enum('pending', 'active', 'rejected', 'cancelled', 'completed', name='mentorship_status'), nullable=False),
+    sa.Column('accepted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['mentor_id'], ['users.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['student_id'], ['users.id'], ondelete='RESTRICT'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index('ix_mentorships_created_at', 'mentorships', ['created_at'], unique=False)
+    op.create_index('ix_mentorships_mentor_id', 'mentorships', ['mentor_id'], unique=False)
+    op.create_index('ix_mentorships_status', 'mentorships', ['status'], unique=False)
+    op.create_index('ix_mentorships_student_id', 'mentorships', ['student_id'], unique=False)
+    op.create_index('uq_active_mentorship_pair', 'mentorships', ['student_id', 'mentor_id'], unique=True, postgresql_where=sa.text("status IN ('pending', 'active')"))
+    op.create_table('mentorship_sessions',
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('mentorship_id', sa.UUID(), nullable=False),
+    sa.Column('created_by_id', sa.UUID(), nullable=False),
+    sa.Column('title', sa.String(length=200), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('scheduled_start', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('scheduled_end', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('meeting_url', sa.String(length=500), nullable=True),
+    sa.Column('shared_notes', sa.Text(), nullable=True),
+    sa.Column('status', sa.Enum('scheduled', 'completed', 'cancelled', name='mentorship_session_status'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['created_by_id'], ['users.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['mentorship_id'], ['mentorships.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index('ix_mentorship_sessions_mentorship_id', 'mentorship_sessions', ['mentorship_id'], unique=False)
+    op.create_index('ix_mentorship_sessions_scheduled_start', 'mentorship_sessions', ['scheduled_start'], unique=False)
+    op.create_index('ix_mentorship_sessions_status', 'mentorship_sessions', ['status'], unique=False)
+
+
+def downgrade() -> None:
+    """Downgrade schema."""
+    op.drop_index('ix_mentorship_sessions_status', table_name='mentorship_sessions')
+    op.drop_index('ix_mentorship_sessions_scheduled_start', table_name='mentorship_sessions')
+    op.drop_index('ix_mentorship_sessions_mentorship_id', table_name='mentorship_sessions')
+    op.drop_table('mentorship_sessions')
+    op.drop_index('uq_active_mentorship_pair', table_name='mentorships', postgresql_where=sa.text("status IN ('pending', 'active')"))
+    op.drop_index('ix_mentorships_student_id', table_name='mentorships')
+    op.drop_index('ix_mentorships_status', table_name='mentorships')
+    op.drop_index('ix_mentorships_mentor_id', table_name='mentorships')
+    op.drop_index('ix_mentorships_created_at', table_name='mentorships')
+    op.drop_table('mentorships')

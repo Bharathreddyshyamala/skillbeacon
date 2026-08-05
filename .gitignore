@@ -1,7 +1,5 @@
-# macOS
 .DS_Store
 
-# Python
 __pycache__/
 *.py[cod]
 *.pyc
@@ -10,29 +8,22 @@ backend/.venv/
 backend/.pytest_cache/
 backend/.coverage
 
-# Secrets
 backend/.env
 
-# Uploaded files
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-# Frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.env
 
-# IDE
 .vscode/
 .idea/
 
-# Logs
 *.log
 
-# Downloaded archives
 *.zip
 
-# Uploaded files
 backend/uploads/**
 !backend/uploads/resumes/
 !backend/uploads/resumes/.gitkeep

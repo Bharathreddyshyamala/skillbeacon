@@ -13,14 +13,19 @@ import Opportunities from "./pages/Opportunities";
 import ManageOpportunities from "./pages/ManageOpportunities";
 import Applications from "./pages/Applications";
 import OpportunityApplicants from "./pages/OpportunityApplicants";
+import Mentorships from "./pages/Mentorships";
+import Challenges from "./pages/Challenges";
+import ChallengeSubmissions from "./pages/ChallengeSubmissions";
+import ManageChallenges from "./pages/ManageChallenges";
+import EmployerChallengeSubmissions from "./pages/EmployerChallengeSubmissions";
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      
-      
+
+
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
@@ -33,11 +38,16 @@ export default function App() {
           <Route path="/app/opportunities/manage" element={<ManageOpportunities />}/>
           <Route path="/app/applications" element={<Applications />}/>
           <Route path="/app/opportunities/:opportunityId/applicants" element={<OpportunityApplicants />}/>
+          <Route path="/app/mentorships" element={<Mentorships />}/>
+          <Route path="/app/challenges" element={<Challenges />}/>
+          <Route path="/app/challenge-submissions" element={<ChallengeSubmissions />}/>
+          <Route path="/app/challenges/manage" element={<ManageChallenges />}/>
+          <Route path="/app/challenges/:challengeId/submissions" element={<EmployerChallengeSubmissions />}/>
 
         </Route>
       </Route>
 
-      {/*<Route path="*" element={<Navigate to="/" replace />} />*/}
+
     </Routes>
   );
 }

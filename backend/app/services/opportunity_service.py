@@ -34,9 +34,6 @@ from app.schemas.opportunity_schema import (
 )
 
 
-# ============================================================
-# Student browse permission
-# ============================================================
 
 
 def ensure_opportunity_browser(
@@ -61,9 +58,6 @@ def ensure_opportunity_browser(
         )
 
 
-# ============================================================
-# Employer management permission
-# ============================================================
 
 
 def ensure_opportunity_manager(
@@ -89,9 +83,6 @@ def ensure_opportunity_manager(
         )
 
 
-# ============================================================
-# Ownership
-# ============================================================
 
 
 def ensure_opportunity_owner(
@@ -122,9 +113,6 @@ def ensure_opportunity_owner(
         )
 
 
-# ============================================================
-# Salary validation
-# ============================================================
 
 
 def validate_salary(
@@ -149,9 +137,6 @@ def validate_salary(
         )
 
 
-# ============================================================
-# Skill validation
-# ============================================================
 
 
 def validate_opportunity_skills(
@@ -207,9 +192,6 @@ def validate_opportunity_skills(
             )
 
 
-# ============================================================
-# Save required skills
-# ============================================================
 
 
 def save_skill_requirements(
@@ -241,9 +223,6 @@ def save_skill_requirements(
         )
 
 
-# ============================================================
-# Student: browse
-# ============================================================
 
 
 def browse_opportunities(
@@ -278,9 +257,6 @@ def browse_opportunities(
     )
 
 
-# ============================================================
-# Student: detail
-# ============================================================
 
 
 def get_opportunity_detail(
@@ -312,8 +288,6 @@ def get_opportunity_detail(
         )
 
 
-    # Students should not manually access
-    # draft or closed opportunities.
 
     if opportunity.status != "open":
 
@@ -330,9 +304,6 @@ def get_opportunity_detail(
     return opportunity
 
 
-# ============================================================
-# Employer: get own opportunities
-# ============================================================
 
 
 def get_my_opportunities(
@@ -351,9 +322,6 @@ def get_my_opportunities(
     )
 
 
-# ============================================================
-# Employer: create
-# ============================================================
 
 
 def create_new_opportunity(
@@ -456,9 +424,6 @@ def create_new_opportunity(
     )
 
 
-# ============================================================
-# Employer: update
-# ============================================================
 
 
 def update_existing_opportunity(
@@ -597,9 +562,6 @@ def update_existing_opportunity(
     )
 
 
-# ============================================================
-# Employer: status
-# ============================================================
 
 
 def change_opportunity_status(
