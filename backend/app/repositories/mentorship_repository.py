@@ -35,9 +35,6 @@ from app.models.user import (
 )
 
 
-# ============================================================
-# Mentorship relationship loading
-# ============================================================
 
 
 def mentorship_load_options():
@@ -54,9 +51,6 @@ def mentorship_load_options():
     )
 
 
-# ============================================================
-# User
-# ============================================================
 
 
 def get_user_by_id(
@@ -69,9 +63,6 @@ def get_user_by_id(
     )
 
 
-# ============================================================
-# Mentor directory
-# ============================================================
 
 
 def list_mentors(
@@ -210,9 +201,6 @@ def list_mentor_skills(
     )
 
 
-# ============================================================
-# Active pair check
-# ============================================================
 
 
 def get_active_mentorship_for_pair(
@@ -244,9 +232,6 @@ def get_active_mentorship_for_pair(
     )
 
 
-# ============================================================
-# Create mentorship
-# ============================================================
 
 
 def create_mentorship(
@@ -276,9 +261,6 @@ def create_mentorship(
     return mentorship
 
 
-# ============================================================
-# Get mentorship
-# ============================================================
 
 
 def get_mentorship_by_id(
@@ -302,9 +284,6 @@ def get_mentorship_by_id(
     )
 
 
-# ============================================================
-# List mentorships for current user
-# ============================================================
 
 
 def list_user_mentorships(
@@ -381,9 +360,6 @@ def list_user_mentorships(
     return items, total
 
 
-# ============================================================
-# Create session
-# ============================================================
 
 
 def create_mentorship_session(
@@ -421,9 +397,6 @@ def create_mentorship_session(
     return session
 
 
-# ============================================================
-# Get session
-# ============================================================
 
 
 def get_mentorship_session_by_id(

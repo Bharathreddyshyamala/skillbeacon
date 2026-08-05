@@ -49,9 +49,6 @@ from app.schemas.mentorship_schema import (
 )
 
 
-# ============================================================
-# Role checks
-# ============================================================
 
 
 def ensure_student(
@@ -152,20 +149,12 @@ def ensure_participant(
         )
 
 
-# ============================================================
-# Profile helper
-# ============================================================
 
 
 def get_user_profile(
     user: User,
 ):
 
-    # This supports several common
-    # relationship names.
-    #
-    # If your project uses another name,
-    # add it here only.
 
     return (
         getattr(
@@ -274,9 +263,6 @@ def get_optional_profile_value(
     return None
 
 
-# ============================================================
-# Response builders
-# ============================================================
 
 
 def session_response(
@@ -389,9 +375,6 @@ def mentorship_response(
     }
 
 
-# ============================================================
-# Mentor directory
-# ============================================================
 
 
 def browse_mentors(
@@ -533,9 +516,6 @@ def browse_mentors(
     }
 
 
-# ============================================================
-# Create request
-# ============================================================
 
 
 def request_mentorship(
@@ -648,9 +628,6 @@ def request_mentorship(
     )
 
 
-# ============================================================
-# My mentorships
-# ============================================================
 
 
 def get_my_mentorships(
@@ -709,9 +686,6 @@ def get_my_mentorships(
     }
 
 
-# ============================================================
-# Detail
-# ============================================================
 
 
 def get_mentorship_detail(
@@ -743,9 +717,6 @@ def get_mentorship_detail(
     )
 
 
-# ============================================================
-# Mentor response
-# ============================================================
 
 
 def respond_to_mentorship(
@@ -829,9 +800,6 @@ def respond_to_mentorship(
     )
 
 
-# ============================================================
-# Student cancel pending request
-# ============================================================
 
 
 def cancel_mentorship_request(
@@ -901,9 +869,6 @@ def cancel_mentorship_request(
     )
 
 
-# ============================================================
-# Complete mentorship
-# ============================================================
 
 
 def complete_mentorship(
@@ -954,7 +919,6 @@ def complete_mentorship(
         )
     )
 
-    # Cancel sessions that have not happened.
     for session in mentorship.sessions:
 
         if (
@@ -977,9 +941,6 @@ def complete_mentorship(
     )
 
 
-# ============================================================
-# Schedule session
-# ============================================================
 
 
 def schedule_mentorship_session(
@@ -1113,9 +1074,6 @@ def schedule_mentorship_session(
     )
 
 
-# ============================================================
-# Update session status
-# ============================================================
 
 
 def change_session_status(

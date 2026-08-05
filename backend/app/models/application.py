@@ -113,21 +113,16 @@ class Application(Base):
         nullable=True,
     )
 
-    # Stored internally only.
-    # Never return this raw path to frontend.
     resume_path: Mapped[Optional[str]] = mapped_column(
         String(500),
         nullable=True,
     )
 
-    # Historical copy of student's profile
-    # at application submission time.
     profile_snapshot: Mapped[Dict] = mapped_column(
         JSONB,
         nullable=False,
     )
 
-    # Private employer-only note.
     employer_note: Mapped[Optional[str]] = mapped_column(
         Text,
         nullable=True,

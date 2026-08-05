@@ -15,9 +15,6 @@ from app.models.mentorship import (
 )
 
 
-# ============================================================
-# Limited request-specific enums
-# ============================================================
 
 
 class MentorshipDecision(str, enum.Enum):
@@ -30,9 +27,6 @@ class SessionStatusUpdate(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-# ============================================================
-# Mentor directory
-# ============================================================
 
 
 class MentorSkillResponse(BaseModel):
@@ -69,9 +63,6 @@ class MentorDirectoryListResponse(BaseModel):
     offset: int
 
 
-# ============================================================
-# Student request
-# ============================================================
 
 
 class MentorshipCreateRequest(BaseModel):
@@ -93,9 +84,6 @@ class MentorshipCreateRequest(BaseModel):
     )
 
 
-# ============================================================
-# Mentor response
-# ============================================================
 
 
 class MentorshipRespondRequest(BaseModel):
@@ -107,9 +95,6 @@ class MentorshipRespondRequest(BaseModel):
     )
 
 
-# ============================================================
-# Session
-# ============================================================
 
 
 class MentorshipSessionCreateRequest(BaseModel):
@@ -166,9 +151,6 @@ class MentorshipSessionResponse(BaseModel):
     updated_at: datetime
 
 
-# ============================================================
-# Mentorship response
-# ============================================================
 
 
 class MentorshipResponse(BaseModel):

@@ -63,9 +63,6 @@ from app.schemas.application_schema import (
 )
 
 
-# ============================================================
-# Status rules
-# ============================================================
 
 
 VALID_EMPLOYER_TRANSITIONS = {
@@ -96,9 +93,6 @@ TERMINAL_STATUSES: Set[
 }
 
 
-# ============================================================
-# Permissions
-# ============================================================
 
 
 def ensure_student(
@@ -174,9 +168,6 @@ def ensure_employer_owns_opportunity(
         )
 
 
-# ============================================================
-# Snapshot
-# ============================================================
 
 
 def create_profile_snapshot(
@@ -184,11 +175,6 @@ def create_profile_snapshot(
     current_user: User,
 ):
 
-    # This assumes your User model relationship
-    # is named student_profile.
-    #
-    # If your relationship has another name,
-    # replace "student_profile" below.
 
     profile = getattr(
         current_user,
@@ -299,9 +285,6 @@ def create_profile_snapshot(
     return snapshot, resume_path
 
 
-# ============================================================
-# Student response
-# ============================================================
 
 
 def student_application_response(
@@ -347,9 +330,6 @@ def student_application_response(
     }
 
 
-# ============================================================
-# Employer response
-# ============================================================
 
 
 def employer_application_response(
@@ -430,9 +410,6 @@ def employer_application_response(
     }
 
 
-# ============================================================
-# Submit
-# ============================================================
 
 
 def submit_application(
@@ -589,9 +566,6 @@ def submit_application(
     )
 
 
-# ============================================================
-# Student list
-# ============================================================
 
 
 def get_my_applications(
@@ -650,9 +624,6 @@ def get_my_applications(
     }
 
 
-# ============================================================
-# Student detail
-# ============================================================
 
 
 def get_my_application(
@@ -692,9 +663,6 @@ def get_my_application(
     )
 
 
-# ============================================================
-# Withdraw
-# ============================================================
 
 
 def withdraw_my_application(
@@ -766,9 +734,6 @@ def withdraw_my_application(
     )
 
 
-# ============================================================
-# Employer list
-# ============================================================
 
 
 def get_opportunity_applications(
@@ -847,9 +812,6 @@ def get_opportunity_applications(
     }
 
 
-# ============================================================
-# Transition validation
-# ============================================================
 
 
 def validate_employer_transition(
@@ -896,9 +858,6 @@ def validate_employer_transition(
         )
 
 
-# ============================================================
-# Employer status update
-# ============================================================
 
 
 def change_application_status(
@@ -985,11 +944,6 @@ def change_application_status(
     )
 
 
-# ============================================================
-# Employer private note
-# Enhancement: note can be changed without
-# changing application status.
-# ============================================================
 
 
 def change_application_note(
@@ -1052,9 +1006,6 @@ def change_application_note(
     )
 
 
-# ============================================================
-# Protected résumé access
-# ============================================================
 
 
 def get_application_resume(
@@ -1084,7 +1035,6 @@ def get_application_resume(
     allowed = False
 
 
-    # Student owns it
     if (
         current_user.role
         == UserRole.STUDENT
@@ -1095,7 +1045,6 @@ def get_application_resume(
         allowed = True
 
 
-    # Employer owns opportunity
     elif (
         current_user.role
         == UserRole.EMPLOYER
@@ -1106,7 +1055,6 @@ def get_application_resume(
         allowed = True
 
 
-    # Admin
     elif (
         current_user.role
         == UserRole.ADMIN

@@ -40,9 +40,6 @@ from app.schemas.skill_schema import (
 )
 
 
-# ============================================================
-# Confidence Score Configuration
-# ============================================================
 
 LEVEL_SCORES: Dict[SkillLevel, float] = {
     SkillLevel.BEGINNER: 20.0,
@@ -52,9 +49,6 @@ LEVEL_SCORES: Dict[SkillLevel, float] = {
 }
 
 
-# ============================================================
-# Calculate Skill Confidence Score
-# ============================================================
 
 def calculate_confidence_score(
     user_skill,
@@ -82,14 +76,12 @@ def calculate_confidence_score(
 
     for evidence in user_skill.evidence:
 
-        # Count approved evidence
         if (
             evidence.status
             == VerificationStatus.APPROVED
         ):
             approved_evidence_count += 1
 
-        # Count approved verifications
         for verification in evidence.verifications:
 
             if (
@@ -99,13 +91,10 @@ def calculate_confidence_score(
                 mentor_or_employer_approvals += 1
 
 
-    # First approved evidence gives +10
     if approved_evidence_count > 0:
         score += 10
 
 
-    # Additional approved evidence gives +5 each,
-    # with maximum additional bonus of +10.
     if approved_evidence_count > 1:
 
         score += min(
@@ -114,8 +103,6 @@ def calculate_confidence_score(
         )
 
 
-    # Each approved verification gives +10.
-    # Verification bonus is capped at +20.
     score += min(
         mentor_or_employer_approvals * 10,
         20,
@@ -128,9 +115,6 @@ def calculate_confidence_score(
     )
 
 
-# ============================================================
-# Validate Skill Passport Owner Role
-# ============================================================
 
 def ensure_skill_owner_role(
     user: User,
@@ -156,9 +140,6 @@ def ensure_skill_owner_role(
         )
 
 
-# ============================================================
-# Skill Catalog
-# ============================================================
 
 def list_skill_catalog(
     db: Session,
@@ -171,9 +152,6 @@ def list_skill_catalog(
     return list_active_skills(db)
 
 
-# ============================================================
-# Create Skill Catalog Item
-# ============================================================
 
 def create_catalog_skill(
     db: Session,
@@ -224,9 +202,6 @@ def create_catalog_skill(
     return skill
 
 
-# ============================================================
-# Get Logged-In User Skills
-# ============================================================
 
 def get_my_skills(
     db: Session,
@@ -248,9 +223,6 @@ def get_my_skills(
     )
 
 
-# ============================================================
-# Add Skill to Skill Passport
-# ============================================================
 
 def add_my_skill(
     db: Session,
@@ -318,9 +290,6 @@ def add_my_skill(
     )
 
 
-# ============================================================
-# Update Skill Level
-# ============================================================
 
 def update_my_skill(
     db: Session,
@@ -381,9 +350,6 @@ def update_my_skill(
     )
 
 
-# ============================================================
-# Remove Skill
-# ============================================================
 
 def remove_my_skill(
     db: Session,
@@ -433,9 +399,6 @@ def remove_my_skill(
     db.commit()
 
 
-# ============================================================
-# Add Skill Evidence
-# ============================================================
 
 def add_skill_evidence(
     db: Session,
@@ -505,9 +468,6 @@ def add_skill_evidence(
     )
 
 
-# ============================================================
-# Verify Skill Evidence
-# ============================================================
 
 def verify_evidence(
     db: Session,
@@ -529,9 +489,6 @@ def verify_evidence(
     recalculated after verification.
     """
 
-    # --------------------------------------------------------
-    # Only these roles can verify evidence
-    # --------------------------------------------------------
 
     allowed_roles = {
         UserRole.MENTOR,
@@ -551,9 +508,6 @@ def verify_evidence(
         )
 
 
-    # --------------------------------------------------------
-    # Find evidence
-    # --------------------------------------------------------
 
     evidence = get_evidence(
         db,
@@ -569,9 +523,6 @@ def verify_evidence(
         )
 
 
-    # --------------------------------------------------------
-    # Prevent self-verification
-    # --------------------------------------------------------
 
     if (
         evidence.user_skill.user_id
@@ -586,10 +537,6 @@ def verify_evidence(
         )
 
 
-    # --------------------------------------------------------
-    # Check whether this verifier already reviewed
-    # this evidence
-    # --------------------------------------------------------
 
     existing = get_verification(
         db,
@@ -600,7 +547,6 @@ def verify_evidence(
 
     if existing:
 
-        # Update existing review
 
         existing.status = (
             request.status
@@ -612,7 +558,6 @@ def verify_evidence(
 
     else:
 
-        # Create new verification
 
         create_verification(
             db,
@@ -623,23 +568,13 @@ def verify_evidence(
         )
 
 
-    # Save verification changes without committing yet.
     db.flush()
 
 
-    # --------------------------------------------------------
-    # IMPORTANT:
-    # Clear SQLAlchemy cached relationship data.
-    #
-    # This ensures the newly created or updated
-    # verification is loaded before calculating
-    # the evidence status.
-    # --------------------------------------------------------
 
     db.expire_all()
 
 
-    # Reload evidence including verifications.
     evidence = get_evidence(
         db,
         evidence_id,
@@ -654,10 +589,6 @@ def verify_evidence(
         )
 
 
-    # ========================================================
-    # STEP 15.10
-    # Determine Evidence Status
-    # ========================================================
 
     verification_statuses = [
 
@@ -669,10 +600,6 @@ def verify_evidence(
     ]
 
 
-    # --------------------------------------------------------
-    # If at least one verifier approves,
-    # evidence becomes APPROVED.
-    # --------------------------------------------------------
 
     if (
         VerificationStatus.APPROVED
@@ -684,10 +611,6 @@ def verify_evidence(
         )
 
 
-    # --------------------------------------------------------
-    # If nobody approved but at least one
-    # verifier rejected, evidence becomes REJECTED.
-    # --------------------------------------------------------
 
     elif (
         VerificationStatus.REJECTED
@@ -699,9 +622,6 @@ def verify_evidence(
         )
 
 
-    # --------------------------------------------------------
-    # Otherwise it stays PENDING.
-    # --------------------------------------------------------
 
     else:
 
@@ -710,14 +630,9 @@ def verify_evidence(
         )
 
 
-    # Save evidence status.
     db.flush()
 
 
-    # --------------------------------------------------------
-    # Reload relationships again before
-    # calculating confidence.
-    # --------------------------------------------------------
 
     db.expire_all()
 
@@ -736,9 +651,6 @@ def verify_evidence(
         )
 
 
-    # --------------------------------------------------------
-    # Recalculate confidence score
-    # --------------------------------------------------------
 
     user_skill.confidence_score = (
         calculate_confidence_score(
@@ -747,24 +659,16 @@ def verify_evidence(
     )
 
 
-    # --------------------------------------------------------
-    # Commit verification + evidence status
-    # + confidence score together
-    # --------------------------------------------------------
 
     db.commit()
 
 
-    # Return refreshed user skill.
     return get_user_skill(
         db,
         user_skill.id,
     )
 
 
-# ============================================================
-# Get Pending Evidence for Verification
-# ============================================================
 
 def get_pending_evidence(
     db: Session,
@@ -815,8 +719,6 @@ def get_pending_evidence(
     ) in rows:
 
 
-        # Do not show someone's own evidence
-        # inside their verification queue.
 
         if owner.id == current_user.id:
             continue

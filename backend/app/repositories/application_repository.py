@@ -34,9 +34,6 @@ def application_load_options():
     )
 
 
-# ============================================================
-# Create
-# ============================================================
 
 
 def create_application(
@@ -66,9 +63,6 @@ def create_application(
     return application
 
 
-# ============================================================
-# Get by ID
-# ============================================================
 
 
 def get_application_by_id(
@@ -90,9 +84,6 @@ def get_application_by_id(
     return db.scalar(statement)
 
 
-# ============================================================
-# Duplicate check
-# ============================================================
 
 
 def get_existing_application(
@@ -114,9 +105,6 @@ def get_existing_application(
     return db.scalar(statement)
 
 
-# ============================================================
-# Student-owned application
-# ============================================================
 
 
 def get_application_for_student(
@@ -141,9 +129,6 @@ def get_application_for_student(
     return db.scalar(statement)
 
 
-# ============================================================
-# Student applications
-# ============================================================
 
 
 def list_student_applications(
@@ -222,9 +207,6 @@ def list_student_applications(
     return items, total
 
 
-# ============================================================
-# Opportunity applicants
-# ============================================================
 
 
 def list_opportunity_applications(
@@ -297,9 +279,6 @@ def list_opportunity_applications(
     return items, total
 
 
-# ============================================================
-# Status
-# ============================================================
 
 
 def update_application_status(
@@ -312,9 +291,6 @@ def update_application_status(
     )
 
 
-# ============================================================
-# Withdraw
-# ============================================================
 
 
 def withdraw_application(
@@ -326,9 +302,6 @@ def withdraw_application(
     )
 
 
-# ============================================================
-# Employer note
-# ============================================================
 
 
 def update_application_note(

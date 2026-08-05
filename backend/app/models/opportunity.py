@@ -26,9 +26,6 @@ from sqlalchemy.orm import (
 from app.models.base import Base, TimestampMixin
 
 
-# ============================================================
-# Enums
-# ============================================================
 
 
 class OpportunityType(str, enum.Enum):
@@ -57,9 +54,6 @@ class OpportunityStatus(str, enum.Enum):
     CLOSED = "closed"
 
 
-# ============================================================
-# Opportunity
-# ============================================================
 
 
 class Opportunity(Base):
@@ -190,9 +184,6 @@ class Opportunity(Base):
     )
 
 
-# ============================================================
-# Opportunity Skill Requirement
-# ============================================================
 
 
 class OpportunitySkill(Base):

@@ -33,6 +33,16 @@ from app.models.mentorship import (
     MentorshipSessionStatus,
     MentorshipStatus,
 )
+from app.models.challenge import (
+    Challenge,
+    ChallengeDifficulty,
+    ChallengeSkill,
+    ChallengeSkillLevel,
+    ChallengeStatus,
+    ChallengeSubmission,
+    ChallengeSubmissionStatus,
+    ChallengeType,
+)
 
 
 __all__ = [

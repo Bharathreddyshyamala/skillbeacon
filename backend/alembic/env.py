@@ -7,20 +7,16 @@ from sqlalchemy.pool import NullPool
 from app.core.config import settings
 from app.models import Base
 
-# Import models so Alembic discovers their tables.
-import app.models  # noqa: F401
+import app.models
 
 
-# Alembic configuration object.
 config = context.config
 
 
-# Configure logging from alembic.ini.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-# SQLAlchemy metadata containing all imported models.
 target_metadata = Base.metadata
 
 

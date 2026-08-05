@@ -26,9 +26,6 @@ from sqlalchemy.orm import (
 from app.models.base import Base, TimestampMixin
 
 
-# ============================================================
-# Enums
-# ============================================================
 
 
 class MentorshipStatus(str, enum.Enum):
@@ -45,9 +42,6 @@ class MentorshipSessionStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-# ============================================================
-# Mentorship
-# ============================================================
 
 
 class Mentorship(Base):
@@ -71,13 +65,6 @@ class Mentorship(Base):
             "created_at",
         ),
 
-        # A student cannot have multiple
-        # pending/active mentorships with
-        # the same mentor.
-        #
-        # Rejected/cancelled/completed records
-        # remain as history and do not block
-        # a future request.
         Index(
             "uq_active_mentorship_pair",
             "student_id",
@@ -190,9 +177,6 @@ class Mentorship(Base):
     )
 
 
-# ============================================================
-# Mentorship Session
-# ============================================================
 
 
 class MentorshipSession(Base):

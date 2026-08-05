@@ -20,9 +20,6 @@ from app.models.opportunity import (
 )
 
 
-# ============================================================
-# Relationship loading
-# ============================================================
 
 
 def opportunity_load_options():
@@ -36,9 +33,6 @@ def opportunity_load_options():
     )
 
 
-# ============================================================
-# Get one opportunity
-# ============================================================
 
 
 def get_opportunity(
@@ -60,9 +54,6 @@ def get_opportunity(
     return db.scalar(statement)
 
 
-# ============================================================
-# Browse open opportunities
-# ============================================================
 
 
 def list_open_opportunities(
@@ -163,9 +154,6 @@ def list_open_opportunities(
     )
 
 
-# ============================================================
-# Employer's opportunities
-# ============================================================
 
 
 def list_my_opportunities(
@@ -195,9 +183,6 @@ def list_my_opportunities(
     )
 
 
-# ============================================================
-# Create
-# ============================================================
 
 
 def create_opportunity(
@@ -218,9 +203,6 @@ def create_opportunity(
     return opportunity
 
 
-# ============================================================
-# Add required skill
-# ============================================================
 
 
 def add_opportunity_skill(
@@ -256,9 +238,6 @@ def add_opportunity_skill(
     return opportunity_skill
 
 
-# ============================================================
-# Clear required skills
-# ============================================================
 
 
 def clear_opportunity_skills(

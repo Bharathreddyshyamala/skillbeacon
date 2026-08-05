@@ -15,25 +15,16 @@ import {
   
   export default function Opportunities() {
   
-    // =========================================================
-    // Navigation
-    // =========================================================
   
     const navigate =
       useNavigate();
   
   
-    // =========================================================
-    // Opportunities
-    // =========================================================
   
     const [items, setItems] =
       useState([]);
   
   
-    // =========================================================
-    // Student application information
-    // =========================================================
   
     const [
       applications,
@@ -53,25 +44,18 @@ import {
     ] = useState("");
   
   
-    // Student profile used only to show
-    // the student what information will
-    // be captured with the application.
     const [
       profile,
       setProfile,
     ] = useState(null);
   
   
-    // Current Skill Passport
     const [
       mySkills,
       setMySkills,
     ] = useState([]);
   
   
-    // =========================================================
-    // Filters
-    // =========================================================
   
     const [search, setSearch] =
       useState("");
@@ -87,9 +71,6 @@ import {
     ] = useState("");
   
   
-    // =========================================================
-    // UI state
-    // =========================================================
   
     const [loading, setLoading] =
       useState(true);
@@ -107,9 +88,6 @@ import {
       useState("");
   
   
-    // =========================================================
-    // Load Opportunities
-    // =========================================================
   
     async function loadOpportunities() {
   
@@ -120,9 +98,6 @@ import {
   
       try {
   
-        // ---------------------------------------
-        // Build opportunity filters
-        // ---------------------------------------
   
         const params =
           new URLSearchParams();
@@ -162,9 +137,6 @@ import {
           params.toString();
   
   
-        // ---------------------------------------
-        // Load all student-related information
-        // ---------------------------------------
   
         const [
           opportunityResponse,
@@ -196,9 +168,6 @@ import {
         ]);
   
   
-        // ---------------------------------------
-        // Opportunities
-        // ---------------------------------------
   
         setItems(
           Array.isArray(
@@ -209,9 +178,6 @@ import {
         );
   
   
-        // ---------------------------------------
-        // Existing applications
-        // ---------------------------------------
   
         setApplications(
           Array.isArray(
@@ -222,18 +188,12 @@ import {
         );
   
   
-        // ---------------------------------------
-        // Profile
-        // ---------------------------------------
   
         setProfile(
           profileResponse || null
         );
   
   
-        // ---------------------------------------
-        // Skill Passport
-        // ---------------------------------------
   
         setMySkills(
           Array.isArray(
@@ -259,9 +219,6 @@ import {
     }
   
   
-    // =========================================================
-    // Initial Load
-    // =========================================================
   
     useEffect(() => {
   
@@ -270,9 +227,6 @@ import {
     }, []);
   
   
-    // =========================================================
-    // Search
-    // =========================================================
   
     function handleSearch(event) {
   
@@ -283,9 +237,6 @@ import {
     }
   
   
-    // =========================================================
-    // Clear Filters
-    // =========================================================
   
     function clearFilters() {
   
@@ -296,8 +247,6 @@ import {
       setOpportunityType("");
   
   
-      // State updates are asynchronous,
-      // so directly fetch all opportunities here.
   
       setLoading(true);
   
@@ -384,9 +333,6 @@ import {
     }
   
   
-    // =========================================================
-    // Find Existing Application
-    // =========================================================
   
     function existingApplication(
       opportunityId,
@@ -400,9 +346,6 @@ import {
     }
   
   
-    // =========================================================
-    // Open / Close Apply Form
-    // =========================================================
   
     function toggleApplyForm(
       opportunityId,
@@ -436,9 +379,6 @@ import {
     }
   
   
-    // =========================================================
-    // Submit Application
-    // =========================================================
   
     async function apply(
       opportunityId,
@@ -449,9 +389,6 @@ import {
       setMessage("");
   
   
-      // Browser-side duplicate protection.
-      // Backend also protects this with
-      // the unique database constraint.
   
       const existing =
         existingApplication(
@@ -516,9 +453,6 @@ import {
         setCoverLetter("");
   
   
-        // Reload data so the Apply button
-        // immediately changes to
-        // View Application.
   
         await loadOpportunities();
   
@@ -538,9 +472,6 @@ import {
     }
   
   
-    // =========================================================
-    // Application Status Badge
-    // =========================================================
   
     function applicationBadgeClass(
       status,
@@ -581,13 +512,7 @@ import {
     }
   
   
-    // =========================================================
-    // Profile helpers
-    // =========================================================
   
-    // Depending on how /profiles/me is shaped,
-    // profile may be returned directly or inside
-    // a "profile" property.
   
     const studentProfile =
       profile?.profile
@@ -613,16 +538,10 @@ import {
       .join(" ");
   
   
-    // =========================================================
-    // UI
-    // =========================================================
   
     return (
       <>
   
-        {/* =====================================================
-            PAGE HEADER
-        ====================================================== */}
   
         <div className="mb-4">
   
@@ -645,9 +564,6 @@ import {
         </div>
   
   
-        {/* =====================================================
-            SUCCESS MESSAGE
-        ====================================================== */}
   
         {message && (
   
@@ -658,9 +574,6 @@ import {
         )}
   
   
-        {/* =====================================================
-            ERROR MESSAGE
-        ====================================================== */}
   
         {error && (
   
@@ -671,9 +584,6 @@ import {
         )}
   
   
-        {/* =====================================================
-            FILTERS
-        ====================================================== */}
   
         <div className="glass-card mb-4">
   
@@ -684,7 +594,6 @@ import {
             }
           >
   
-            {/* Search */}
   
             <div className="col-lg-4">
   
@@ -707,7 +616,6 @@ import {
             </div>
   
   
-            {/* Work Mode */}
   
             <div className="col-lg-3">
   
@@ -747,7 +655,6 @@ import {
             </div>
   
   
-            {/* Opportunity Type */}
   
             <div className="col-lg-3">
   
@@ -793,7 +700,6 @@ import {
             </div>
   
   
-            {/* Search Button */}
   
             <div className="col-lg-1 d-flex align-items-end">
   
@@ -807,7 +713,6 @@ import {
             </div>
   
   
-            {/* Clear Button */}
   
             <div className="col-lg-1 d-flex align-items-end">
   
@@ -828,9 +733,6 @@ import {
         </div>
   
   
-        {/* =====================================================
-            LOADING
-        ====================================================== */}
   
         {loading && (
   
@@ -841,9 +743,6 @@ import {
         )}
   
   
-        {/* =====================================================
-            EMPTY STATE
-        ====================================================== */}
   
         {
           !loading &&
@@ -862,9 +761,6 @@ import {
         }
   
   
-        {/* =====================================================
-            OPPORTUNITY CARDS
-        ====================================================== */}
   
         {
           !loading &&
@@ -884,9 +780,6 @@ import {
                   className="glass-card mb-4"
                 >
   
-                  {/* -------------------------------------------
-                      Header
-                  -------------------------------------------- */}
   
                   <div className="d-flex justify-content-between gap-3 flex-wrap">
   
@@ -930,7 +823,6 @@ import {
                       </span>
   
   
-                      {/* Existing Application Status */}
   
                       {
                         application && (
@@ -963,22 +855,15 @@ import {
                   </div>
   
   
-                  {/* -------------------------------------------
-                      Description
-                  -------------------------------------------- */}
   
                   <p>
                     {item.description}
                   </p>
   
   
-                  {/* -------------------------------------------
-                      Opportunity Details
-                  -------------------------------------------- */}
   
                   <div className="row small mb-3">
   
-                    {/* Location */}
   
                     <div className="col-md-4">
   
@@ -999,7 +884,6 @@ import {
                     </div>
   
   
-                    {/* Employment */}
   
                     <div className="col-md-4">
   
@@ -1024,7 +908,6 @@ import {
                     </div>
   
   
-                    {/* Deadline */}
   
                     <div className="col-md-4">
   
@@ -1047,9 +930,6 @@ import {
                   </div>
   
   
-                  {/* -------------------------------------------
-                      Compensation
-                  -------------------------------------------- */}
   
                   {
                     (
@@ -1087,9 +967,6 @@ import {
                   }
   
   
-                  {/* -------------------------------------------
-                      Required Skills
-                  -------------------------------------------- */}
   
                   <div className="mt-3">
   
@@ -1157,16 +1034,10 @@ import {
                   </div>
   
   
-                  {/* =================================================
-                      APPLICATION ACTION
-                  ================================================== */}
   
                   <div className="mt-4">
   
   
-                    {/* -----------------------------------------------
-                        Already Applied
-                    ------------------------------------------------ */}
   
                     {
                       application ? (
@@ -1217,9 +1088,6 @@ import {
   
                       ) : (
   
-                        /* -------------------------------------------
-                            Apply Button
-                        -------------------------------------------- */
   
                         <div>
   
@@ -1243,9 +1111,6 @@ import {
                           </button>
   
   
-                          {/* =========================================
-                              APPLY FORM
-                          ========================================== */}
   
                           {
                             applyingId
@@ -1273,9 +1138,6 @@ import {
                                 </p>
   
   
-                                {/* -------------------------------
-                                    Profile Summary
-                                -------------------------------- */}
   
                                 <div className="mb-4">
   
@@ -1335,9 +1197,6 @@ import {
                                 </div>
   
   
-                                {/* -------------------------------
-                                    Skill Passport Preview
-                                -------------------------------- */}
   
                                 <div className="mb-4">
   
@@ -1402,9 +1261,6 @@ import {
                                 </div>
   
   
-                                {/* -------------------------------
-                                    Résumé Availability
-                                -------------------------------- */}
   
                                 <div className="mb-4">
   
@@ -1446,9 +1302,6 @@ import {
                                 </div>
   
   
-                                {/* -------------------------------
-                                    Cover Letter
-                                -------------------------------- */}
   
                                 <div className="mb-3">
   
@@ -1501,9 +1354,6 @@ import {
                                 </div>
   
   
-                                {/* -------------------------------
-                                    Confirmation Notice
-                                -------------------------------- */}
   
                                 <div className="alert alert-info small">
   
@@ -1519,9 +1369,6 @@ import {
                                 </div>
   
   
-                                {/* -------------------------------
-                                    Submit / Cancel
-                                -------------------------------- */}
   
                                 <div className="d-flex gap-2">
   
@@ -1577,9 +1424,6 @@ import {
                     }
   
   
-                    {/* -----------------------------------------------
-                        External Application Link
-                    ------------------------------------------------ */}
   
                     {
                       item.application_url && (
