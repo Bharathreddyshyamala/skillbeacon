@@ -55,6 +55,10 @@ from app.schemas.challenge_schema import (
     ChallengeUpdateRequest,
 )
 
+from app.services.notification_service import (
+    create_notification,
+)
+
 
 
 
@@ -921,6 +925,49 @@ def submit_challenge_solution(
 
     try:
 
+        # Flush first so the new submission receives
+        # its database-generated ID before the notification
+        # references it.
+        db.flush()
+
+
+        create_notification(
+            db=db,
+
+            user_id=(
+                challenge.employer_id
+            ),
+
+            notification_type=(
+                "challenge_submission"
+            ),
+
+            title=(
+                "New challenge submission"
+            ),
+
+            message=(
+                f"A student submitted a solution "
+                f"for your challenge "
+                f"'{challenge.title}'."
+            ),
+
+            action_url=(
+                "/app/challenges"
+            ),
+
+            related_entity_type=(
+                "challenge_submission"
+            ),
+
+            related_entity_id=(
+                submission.id
+            ),
+        )
+
+
+        # Submission and employer notification
+        # are committed together.
         db.commit()
 
     except IntegrityError:
@@ -1299,6 +1346,63 @@ def review_challenge_submission(
     )
 
 
+    if (
+        request.status
+        in {
+            ChallengeSubmissionStatus.ACCEPTED,
+            ChallengeSubmissionStatus.REJECTED,
+        }
+    ):
+
+        status_value = (
+            request.status.value
+            if hasattr(
+                request.status,
+                "value",
+            )
+            else str(
+                request.status
+            )
+        )
+
+
+        create_notification(
+            db=db,
+
+            user_id=(
+                submission.student_id
+            ),
+
+            notification_type=(
+                "challenge_review"
+            ),
+
+            title=(
+                "Challenge submission reviewed"
+            ),
+
+            message=(
+                f"Your submission for "
+                f"'{submission.challenge.title}' "
+                f"has been {status_value.replace('_', ' ')}."
+            ),
+
+            action_url=(
+                "/app/challenges"
+            ),
+
+            related_entity_type=(
+                "challenge_submission"
+            ),
+
+            related_entity_id=(
+                submission.id
+            ),
+        )
+
+
+    # Review changes and the student notification
+    # are committed together.
     db.commit()
 
 
