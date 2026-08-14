@@ -10,7 +10,7 @@ The platform helps users build professional profiles, maintain a verified Skill 
 
 ## Project Status
 
-SkillBeacon has been implemented through  **Applications**.
+SkillBeacon has been implemented through  **Notifications**.
 
 ### Completed Modules
 
@@ -40,7 +40,7 @@ SkillBeacon has been implemented through  **Applications**.
 - Student applications
 - Employer applicant review
 - Application status workflow
-- Protected résumé access
+- Protected resume access
 
 
 ## User Roles
