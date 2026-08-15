@@ -48,6 +48,10 @@ from app.schemas.mentorship_schema import (
     SessionStatusUpdate,
 )
 
+from app.services.notification_service import (
+    create_notification,
+)
+
 
 
 
@@ -602,6 +606,54 @@ def request_mentorship(
     )
 
     try:
+
+        # Flush first so the mentorship receives its ID
+        # before it is referenced by the notification.
+        db.flush()
+
+
+        student_name = get_user_display_name(
+            current_user
+        )
+
+
+        create_notification(
+            db=db,
+
+            user_id=(
+                mentor.id
+            ),
+
+            notification_type=(
+                "mentorship_request"
+            ),
+
+            title=(
+                "New mentorship request"
+            ),
+
+            message=(
+                f"{student_name} sent you "
+                f"a mentorship request for "
+                f"{request.focus_area.strip()}."
+            ),
+
+            action_url=(
+                "/app/mentorship"
+            ),
+
+            related_entity_type=(
+                "mentorship"
+            ),
+
+            related_entity_id=(
+                mentorship.id
+            ),
+        )
+
+
+        # Mentorship request and notification
+        # are committed together.
         db.commit()
 
     except IntegrityError:
@@ -783,11 +835,85 @@ def respond_to_mentorship(
             )
         )
 
+
+        create_notification(
+            db=db,
+
+            user_id=(
+                mentorship.student_id
+            ),
+
+            notification_type=(
+                "mentorship_accepted"
+            ),
+
+            title=(
+                "Mentorship request accepted"
+            ),
+
+            message=(
+                f"{get_user_display_name(mentorship.mentor)} "
+                f"accepted your mentorship request "
+                f"for {mentorship.focus_area}."
+            ),
+
+            action_url=(
+                "/app/mentorship"
+            ),
+
+            related_entity_type=(
+                "mentorship"
+            ),
+
+            related_entity_id=(
+                mentorship.id
+            ),
+        )
+
     else:
+
         mentorship.status = (
             MentorshipStatus.REJECTED
         )
 
+
+        create_notification(
+            db=db,
+
+            user_id=(
+                mentorship.student_id
+            ),
+
+            notification_type=(
+                "mentorship_rejected"
+            ),
+
+            title=(
+                "Mentorship request update"
+            ),
+
+            message=(
+                f"{get_user_display_name(mentorship.mentor)} "
+                f"did not accept your mentorship "
+                f"request for {mentorship.focus_area}."
+            ),
+
+            action_url=(
+                "/app/mentorship"
+            ),
+
+            related_entity_type=(
+                "mentorship"
+            ),
+
+            related_entity_id=(
+                mentorship.id
+            ),
+        )
+
+
+    # Mentorship decision and notification
+    # are committed together.
     db.commit()
 
     mentorship = get_mentorship_by_id(

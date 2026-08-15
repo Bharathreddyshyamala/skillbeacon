@@ -139,3 +139,8 @@ class User(TimestampMixin, Base):
     "ChallengeSubmission",
     back_populates="student",
     )
+    notifications = relationship(
+    "Notification",
+    back_populates="user",
+    cascade="all, delete-orphan",
+    )

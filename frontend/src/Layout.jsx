@@ -1,10 +1,20 @@
 import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
   NavLink,
   Outlet,
+  useLocation,
   useNavigate,
 } from "react-router";
 
 import { useAuth } from "./AuthContext";
+
+import {
+  apiRequest,
+} from "./api";
 
 
 export default function Layout() {
@@ -12,6 +22,17 @@ export default function Layout() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const [
+    unreadNotifications,
+    setUnreadNotifications,
+  ] = useState(0);
+
+
+  // =========================================================
+  // Logout
+  // =========================================================
 
   async function handleLogout() {
     await logout();
@@ -25,44 +46,121 @@ export default function Layout() {
   }
 
 
+  // =========================================================
+  // Role Permissions
+  // =========================================================
 
-
+  // Student + Mentor can maintain
+  // their personal Skill Passport.
   const canManageSkills =
     user?.role === "student" ||
     user?.role === "mentor";
 
 
+  // Mentor can verify skill evidence.
   const canVerifyEvidence =
     user?.role === "mentor";
 
 
-
+  // Only students browse published opportunities.
   const canBrowseOpportunities =
     user?.role === "student";
 
 
+  // Only students can view and manage
+  // their own applications.
   const canViewApplications =
     user?.role === "student";
 
 
+  // Employers create and manage opportunities.
   const canManageOpportunities =
     user?.role === "employer";
 
 
-
+  // Students and mentors use mentorship features.
   const canUseMentorships =
     user?.role === "student" ||
     user?.role === "mentor";
 
 
-
+  // Students browse and submit employer challenges.
   const canBrowseChallenges =
     user?.role === "student";
 
 
-
+  // Employers create and manage challenges.
   const canManageChallenges =
     user?.role === "employer";
+
+
+  // Notifications are available to every
+  // authenticated user, regardless of role.
+  const canViewNotifications =
+    Boolean(user);
+
+
+  // =========================================================
+  // Notifications
+  // =========================================================
+
+  async function loadUnreadNotifications() {
+    if (!user) {
+      setUnreadNotifications(0);
+      return;
+    }
+
+    try {
+      const result = await apiRequest(
+        "/notifications/unread-count"
+      );
+
+      setUnreadNotifications(
+        result?.unread_count || 0
+      );
+
+    } catch (error) {
+      // Do not break the main layout if the
+      // notification endpoint is temporarily unavailable.
+      console.error(
+        "Failed to load unread notifications:",
+        error
+      );
+
+      setUnreadNotifications(0);
+    }
+  }
+
+
+  useEffect(
+    () => {
+      if (!user) {
+        setUnreadNotifications(0);
+        return;
+      }
+
+      loadUnreadNotifications();
+
+      // Refresh periodically so notifications created
+      // while the user remains on the same page can appear.
+      const intervalId = window.setInterval(
+        () => {
+          loadUnreadNotifications();
+        },
+        30000
+      );
+
+      return () => {
+        window.clearInterval(
+          intervalId
+        );
+      };
+    },
+    [
+      user,
+      location.pathname,
+    ]
+  );
 
 
   return (
@@ -74,15 +172,12 @@ export default function Layout() {
         <div className="container">
 
 
-
           <NavLink
             className="navbar-brand brand"
             to="/app/dashboard"
           >
             SkillBeacon
           </NavLink>
-
-
 
 
           <button
@@ -98,14 +193,12 @@ export default function Layout() {
           </button>
 
 
-
           <div
             className="collapse navbar-collapse"
             id="navMenu"
           >
 
             <div className="navbar-nav me-auto">
-
 
 
               <NavLink
@@ -163,6 +256,7 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
               {canBrowseChallenges && (
                 <NavLink
                   className="nav-link"
@@ -183,8 +277,6 @@ export default function Layout() {
               )}
 
 
-
-
               {canManageChallenges && (
                 <NavLink
                   className="nav-link"
@@ -193,8 +285,6 @@ export default function Layout() {
                   Manage Challenges
                 </NavLink>
               )}
-
-
 
 
               {canVerifyEvidence && (
@@ -206,9 +296,37 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
+              {canViewNotifications && (
+                <NavLink
+                  className="nav-link d-flex align-items-center"
+                  to="/app/notifications"
+                >
+                  <span>
+                    Notifications
+                  </span>
+
+                  {unreadNotifications > 0 && (
+                    <span
+                      className="badge rounded-pill bg-danger ms-2"
+                      title={`${unreadNotifications} unread notification${
+                        unreadNotifications !== 1
+                          ? "s"
+                          : ""
+                      }`}
+                    >
+                      {
+                        unreadNotifications > 99
+                          ? "99+"
+                          : unreadNotifications
+                      }
+                    </span>
+                  )}
+                </NavLink>
+              )}
+
+
             </div>
-
-
 
 
             <div className="d-flex align-items-center gap-3">
@@ -242,8 +360,6 @@ export default function Layout() {
         </div>
 
       </nav>
-
-
 
 
       <main className="container py-5">

@@ -61,6 +61,9 @@ from app.schemas.application_schema import (
     ApplicationNoteRequest,
     ApplicationStatusRequest,
 )
+from app.services.notification_service import (
+    create_notification,
+)
 
 
 
@@ -536,6 +539,44 @@ def submit_application(
 
     try:
 
+        db.flush()
+
+
+        create_notification(
+            db=db,
+
+            user_id=(
+                current_user.id
+            ),
+
+            notification_type=(
+                "application_submitted"
+            ),
+
+            title=(
+                "Application submitted"
+            ),
+
+            message=(
+                f"Your application for "
+                f"{opportunity.title} "
+                f"was submitted successfully."
+            ),
+
+            action_url=(
+                "/app/applications"
+            ),
+
+            related_entity_type=(
+                "application"
+            ),
+
+            related_entity_id=(
+                application.id
+            ),
+        )
+
+
         db.commit()
 
     except IntegrityError:
@@ -925,6 +966,53 @@ def change_application_status(
         datetime.now(
             timezone.utc
         )
+    )
+
+
+    status_value = (
+        request.status.value
+        if hasattr(
+            request.status,
+            "value",
+        )
+        else str(
+            request.status
+        )
+    )
+
+
+    create_notification(
+        db=db,
+
+        user_id=(
+            application.student_id
+        ),
+
+        notification_type=(
+            "application_status"
+        ),
+
+        title=(
+            "Application status updated"
+        ),
+
+        message=(
+            f"Your application for "
+            f"{application.opportunity.title} "
+            f"is now {status_value.replace('_', ' ')}."
+        ),
+
+        action_url=(
+            "/app/applications"
+        ),
+
+        related_entity_type=(
+            "application"
+        ),
+
+        related_entity_id=(
+            application.id
+        ),
     )
 
 

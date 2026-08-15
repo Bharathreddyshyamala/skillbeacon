@@ -43,6 +43,7 @@ from app.models.challenge import (
     ChallengeSubmissionStatus,
     ChallengeType,
 )
+from app.models.notification import Notification
 
 
 __all__ = [

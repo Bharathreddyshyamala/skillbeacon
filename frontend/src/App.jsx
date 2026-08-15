@@ -18,6 +18,7 @@ import Challenges from "./pages/Challenges";
 import ChallengeSubmissions from "./pages/ChallengeSubmissions";
 import ManageChallenges from "./pages/ManageChallenges";
 import EmployerChallengeSubmissions from "./pages/EmployerChallengeSubmissions";
+import Notifications from "./pages/Notifications";
 export default function App() {
   return (
     <Routes>
@@ -43,7 +44,7 @@ export default function App() {
           <Route path="/app/challenge-submissions" element={<ChallengeSubmissions />}/>
           <Route path="/app/challenges/manage" element={<ManageChallenges />}/>
           <Route path="/app/challenges/:challengeId/submissions" element={<EmployerChallengeSubmissions />}/>
-
+          <Route path="/app/notifications" element={<Notifications />}/>
         </Route>
       </Route>
 
