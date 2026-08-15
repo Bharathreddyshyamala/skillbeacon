@@ -44,6 +44,9 @@ from app.models.challenge import (
     ChallengeType,
 )
 from app.models.notification import Notification
+from app.models.admin_audit_log import (
+    AdminAuditLog,
+)
 
 
 __all__ = [
