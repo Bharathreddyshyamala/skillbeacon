@@ -31,7 +31,7 @@ SkillBeacon has been implemented through  **Notifications**.
 - Role-based navigation
 - Dashboard
 - User profile management
-- Résumé upload support
+- Resume upload support
 - Skill catalog
 - Skill Passport
 - Skill evidence and verification
