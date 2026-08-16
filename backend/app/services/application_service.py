@@ -325,6 +325,9 @@ def student_application_response(
                 application.resume_path
             ),
 
+        "resume_url":
+            application.resume_path,
+
         "created_at":
             application.created_at,
 
@@ -398,6 +401,9 @@ def employer_application_response(
             bool(
                 application.resume_path
             ),
+
+        "resume_url":
+            application.resume_path,
 
         "employer_note":
             application.employer_note,
@@ -1176,8 +1182,20 @@ def get_application_resume(
         )
 
 
+    resume_val = (
+        application.resume_path.strip()
+    )
+
+
+    if (
+        resume_val.startswith("http://")
+        or resume_val.startswith("https://")
+    ):
+        return resume_val
+
+
     file_path = Path(
-        application.resume_path
+        resume_val
     )
 
 

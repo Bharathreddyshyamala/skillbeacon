@@ -320,6 +320,19 @@ import {
                 </div>
               </div>
   
+              {item.resume_available && (
+                <div className="col-12 mt-3 pt-2 border-top border-secondary border-opacity-25">
+                  <a
+                    href={item.resume_url || `/api/applications/${item.id}/resume`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline-info btn-sm"
+                  >
+                    View Submitted Résumé
+                  </a>
+                </div>
+              )}
+  
             </div>
   
           </div>

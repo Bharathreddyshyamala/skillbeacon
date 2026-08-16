@@ -447,19 +447,16 @@ import {
   
   
               {item.resume_available && (
-  
-                <button
-                  type="button"
-                  className="btn btn-outline-info btn-sm mb-4"
-                  onClick={() =>
-                    downloadResume(
-                      item.id
-                    )
-                  }
-                >
-                  Download Résumé
-                </button>
-  
+                <div className="mb-4">
+                  <a
+                    href={item.resume_url || `/api/applications/${item.id}/resume`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline-info btn-sm"
+                  >
+                    View / Download Résumé
+                  </a>
+                </div>
               )}
   
   

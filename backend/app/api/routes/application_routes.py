@@ -12,6 +12,7 @@ from fastapi import (
 
 from fastapi.responses import (
     FileResponse,
+    RedirectResponse,
 )
 
 from sqlalchemy.orm import Session
@@ -331,25 +332,37 @@ def application_resume_route(
     ),
 ):
 
-    file_path = get_application_resume(
+    resume_target = get_application_resume(
         db,
         current_user,
         application_id,
     )
 
 
+    if isinstance(resume_target, str) and (
+        resume_target.startswith("http://")
+        or resume_target.startswith("https://")
+    ):
+        return RedirectResponse(
+            url=resume_target,
+            status_code=307,
+        )
+
+
     media_type, _ = (
         mimetypes.guess_type(
-            str(file_path)
+            str(resume_target)
         )
     )
 
 
     return FileResponse(
-        path=str(file_path),
+        path=str(resume_target),
 
         filename=(
-            file_path.name
+            resume_target.name
+            if hasattr(resume_target, "name")
+            else "resume"
         ),
 
         media_type=(
