@@ -232,6 +232,32 @@ import {
     }
   
   
+    async function downloadResume(
+      applicationId,
+    ) {
+      setError("");
+      try {
+        const data = await apiRequest(
+          `/applications/${applicationId}/resume`
+        );
+        if (data?.download_url) {
+          window.open(
+            data.download_url,
+            "_blank",
+            "noopener,noreferrer"
+          );
+        } else {
+          setError("No download link available.");
+        }
+      } catch (requestError) {
+        setError(
+          requestError.message ||
+          "Unable to download résumé."
+        );
+      }
+    }
+
+
     return (
       <>
   
@@ -448,14 +474,17 @@ import {
   
               {item.resume_available && (
                 <div className="mb-4">
-                  <a
-                    href={item.resume_url || `/api/applications/${item.id}/resume`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
                     className="btn btn-outline-info btn-sm"
+                    onClick={() =>
+                      downloadResume(
+                        item.id
+                      )
+                    }
                   >
                     View / Download Résumé
-                  </a>
+                  </button>
                 </div>
               )}
   

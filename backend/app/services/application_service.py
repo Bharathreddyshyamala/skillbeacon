@@ -56,6 +56,9 @@ from app.repositories.skill_repository import (
     list_user_skills,
 )
 
+import re
+
+from app.core.config import settings
 from app.schemas.application_schema import (
     ApplicationCreateRequest,
     ApplicationNoteRequest,
@@ -63,6 +66,9 @@ from app.schemas.application_schema import (
 )
 from app.services.notification_service import (
     create_notification,
+)
+from app.services.storage_service import (
+    generate_presigned_download_url,
 )
 
 
@@ -1186,12 +1192,31 @@ def get_application_resume(
         application.resume_path.strip()
     )
 
+    base_prefix = (
+        settings.r2_public_base_url.rstrip("/") + "/"
+    )
 
     if (
-        resume_val.startswith("http://")
+        resume_val.startswith(base_prefix)
+        or resume_val.startswith("http://")
         or resume_val.startswith("https://")
     ):
-        return resume_val
+        if resume_val.startswith(base_prefix):
+            storage_key = resume_val[len(base_prefix):]
+        else:
+            match = re.search(r"(resumes/[^?#]+)", resume_val)
+            storage_key = match.group(1) if match else resume_val
+
+        try:
+            return generate_presigned_download_url(storage_key)
+        except Exception:
+            return resume_val
+
+    if resume_val.startswith("resumes/") or resume_val.startswith("documents/"):
+        try:
+            return generate_presigned_download_url(resume_val)
+        except Exception:
+            pass
 
 
     file_path = Path(

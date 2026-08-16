@@ -147,6 +147,19 @@ export default function Profile() {
     }
   }
 
+  async function handleViewDocument(docId) {
+    try {
+      const data = await apiRequest(`/documents/${docId}/download`);
+      if (data?.download_url) {
+        window.open(data.download_url, "_blank", "noopener,noreferrer");
+      } else {
+        setError("Download link not available.");
+      }
+    } catch (err) {
+      setError(err.message || "Failed to open document.");
+    }
+  }
+
   if (!envelope && !error) return <p className="text-secondary">Loading profile...</p>;
 
   return <>
@@ -258,15 +271,14 @@ export default function Profile() {
                         )}
                       </div>
                       <div className="d-flex gap-2 mt-2 pt-2 border-top border-secondary">
-                        <a
-                          href={doc.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          type="button"
                           className="btn btn-sm btn-outline-light py-0 px-2"
                           style={{ fontSize: "11px" }}
+                          onClick={() => handleViewDocument(doc.id)}
                         >
                           View
-                        </a>
+                        </button>
                         {!isPrimary && (
                           <button
                             type="button"

@@ -343,10 +343,10 @@ def application_resume_route(
         resume_target.startswith("http://")
         or resume_target.startswith("https://")
     ):
-        return RedirectResponse(
-            url=resume_target,
-            status_code=307,
-        )
+        return {
+            "download_url": resume_target,
+            "file_name": "resume.pdf",
+        }
 
 
     media_type, _ = (
