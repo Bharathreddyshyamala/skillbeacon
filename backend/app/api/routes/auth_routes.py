@@ -10,6 +10,7 @@ from app.schemas.auth_schema import (
     MessageResponse,
     RefreshRequest,
     RegisterRequest,
+    SyncNeonSessionRequest,
     TokenResponse,
     UserResponse,
 )
@@ -18,10 +19,31 @@ from app.services.auth_service import (
     logout_user,
     refresh_user_tokens,
     register_user,
+    sync_neon_user_session,
 )
 
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+
+@router.post(
+    "/sync-session",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+)
+def sync_session(
+    request: SyncNeonSessionRequest,
+    db: Session = Depends(get_db),
+) -> User:
+    """
+    Sync an authenticated Neon Auth session with the local SkillBeacon User
+    domain model, ensuring role profiles are created.
+    """
+    return sync_neon_user_session(
+        db=db,
+        session_token=request.session_token,
+        desired_role=request.role,
+    )
 
 
 @router.post(

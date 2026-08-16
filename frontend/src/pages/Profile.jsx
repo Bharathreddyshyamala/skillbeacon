@@ -28,9 +28,16 @@ export default function Profile() {
   const [envelope, setEnvelope] = useState(null);
   const [form, setForm] = useState(empty);
   const [resume, setResume] = useState(null);
+  const [resumesList, setResumesList] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const loadResumes = () => {
+    apiRequest("/documents/my-documents?document_type=resume")
+      .then((data) => setResumesList(data.items || []))
+      .catch(() => {});
+  };
 
   useEffect(() => {
     apiRequest("/profiles/me").then((data) => {
@@ -43,6 +50,9 @@ export default function Profile() {
         mentorship_formats: toText(p.mentorship_formats),
         years_of_experience: p.years_of_experience ?? "",
       });
+      if (data.profile_type === "student") {
+        loadResumes();
+      }
     }).catch((err) => setError(err.message));
   }, []);
 
@@ -94,11 +104,47 @@ export default function Profile() {
   async function upload(e) {
     e.preventDefault();
     if (!resume) return setError("Choose a PDF or DOCX resume.");
-    const data = new FormData(); data.append("resume", resume);
+    const data = new FormData();
+    data.append("resume", resume);
     try {
-      const result = await apiRequest("/profiles/me/resume", { method: "POST", body: data });
-      setEnvelope(result); setMessage("Resume uploaded successfully."); setError("");
-    } catch (err) { setError(err.message); }
+      const result = await apiRequest("/profiles/me/resume", {
+        method: "POST",
+        body: data,
+      });
+      setEnvelope(result);
+      setMessage("Resume uploaded and added to your library successfully.");
+      setError("");
+      setResume(null);
+      loadResumes();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function handleDeleteResume(docId) {
+    if (!window.confirm("Are you sure you want to delete this resume?")) return;
+    try {
+      await apiRequest(`/documents/${docId}`, { method: "DELETE" });
+      setMessage("Resume deleted from library.");
+      loadResumes();
+      const updatedProfile = await apiRequest("/profiles/me");
+      setEnvelope(updatedProfile);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function handleSetPrimaryResume(fileUrl) {
+    try {
+      const updated = await apiRequest("/profiles/me", {
+        method: "PUT",
+        body: JSON.stringify({ ...payload(), resume_path: fileUrl }),
+      });
+      setEnvelope(updated);
+      setMessage("Primary active resume updated.");
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   if (!envelope && !error) return <p className="text-secondary">Loading profile...</p>;
@@ -155,13 +201,141 @@ export default function Profile() {
       <div className="col-xl-4">
         <aside className="glass-card"><p className="section-label">Visibility</p>
           <span className="status-pill">{form.is_public ? "Public" : "Private"}</span></aside>
-        {role === "student" && <form className="glass-card mt-4" onSubmit={upload}>
-          <p className="section-label">Resume</p><h2 className="h5">Upload PDF or DOCX</h2>
-          <p className="small text-secondary">Maximum file size: 5 MB.</p>
-          <input className="form-control" type="file" accept=".pdf,.docx" onChange={(e) => setResume(e.target.files?.[0] || null)} />
-          <button className="btn btn-outline-info w-100 mt-3">Upload resume</button>
-          {envelope?.profile?.resume_path && <p className="small text-info mt-3 mb-0">Resume uploaded</p>}
-        </form>}
+        {role === "student" && (
+          <div className="glass-card mt-4">
+            <p className="section-label">Resume Library (Cloudflare R2)</p>
+            <h2 className="h5">Upload New Resume</h2>
+            <p className="small text-secondary">
+              PDF or DOCX (Max 5 MB). Upload multiple tailored resumes for different roles.
+            </p>
+            <form onSubmit={upload}>
+              <input
+                className="form-control"
+                type="file"
+                accept=".pdf,.docx,.doc"
+                onChange={(e) => setResume(e.target.files?.[0] || null)}
+              />
+              <button
+                className="btn btn-outline-info w-100 mt-3"
+                disabled={!resume}
+              >
+                Upload to Resume Library
+              </button>
+            </form>
+
+            <div className="mt-4">
+              <h6 className="fw-semibold text-secondary text-uppercase small">
+                Your Stored Resumes ({resumesList.length})
+              </h6>
+              {resumesList.length === 0 && (
+                <p className="small text-muted mb-0">No resumes stored yet.</p>
+              )}
+              <div className="d-flex flex-column gap-2 mt-2">
+                {resumesList.map((doc) => {
+                  const isPrimary =
+                    envelope?.profile?.resume_path === doc.file_url;
+                  return (
+                    <div
+                      key={doc.id}
+                      className={`p-2 rounded bg-dark border ${
+                        isPrimary ? "border-info" : "border-secondary"
+                      }`}
+                    >
+                      <div className="d-flex align-items-center justify-content-between">
+                        <div className="text-truncate me-2">
+                          <span className="small fw-semibold text-light text-truncate d-block">
+                            {doc.file_name}
+                          </span>
+                          <span className="text-muted" style={{ fontSize: "11px" }}>
+                            {(doc.size_bytes / (1024 * 1024)).toFixed(2)} MB •{" "}
+                            {new Date(doc.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        {isPrimary && (
+                          <span className="badge bg-info text-dark" style={{ fontSize: "10px" }}>
+                            Primary
+                          </span>
+                        )}
+                      </div>
+                      <div className="d-flex gap-2 mt-2 pt-2 border-top border-secondary">
+                        <a
+                          href={doc.file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-sm btn-outline-light py-0 px-2"
+                          style={{ fontSize: "11px" }}
+                        >
+                          View
+                        </a>
+                        {!isPrimary && (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-info py-0 px-2"
+                            style={{ fontSize: "11px" }}
+                            onClick={() => handleSetPrimaryResume(doc.file_url)}
+                          >
+                            Set Primary
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger py-0 px-2 ms-auto"
+                          style={{ fontSize: "11px" }}
+                          onClick={() => handleDeleteResume(doc.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+        {role === "employer" && (
+          <div className="glass-card mt-4">
+            <p className="section-label">Company Brand</p>
+            <h2 className="h5">Company Logo</h2>
+            <p className="small text-secondary">
+              PNG, JPG, SVG, or WEBP (Max 2 MB).
+            </p>
+            {envelope?.profile?.logo_path && (
+              <div className="mb-3 text-center">
+                <img
+                  src={envelope.profile.logo_path}
+                  alt="Company Logo"
+                  className="img-fluid rounded border border-secondary p-2 bg-dark"
+                  style={{ maxHeight: "100px" }}
+                />
+              </div>
+            )}
+            <input
+              className="form-control"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const fd = new FormData();
+                fd.append("file", file);
+                try {
+                  const doc = await apiRequest("/documents/upload-logo", {
+                    method: "POST",
+                    body: fd,
+                  });
+                  setEnvelope((prev) => ({
+                    ...prev,
+                    profile: { ...prev.profile, logo_path: doc.file_url },
+                  }));
+                  setMessage("Company logo uploaded successfully to Cloudflare R2.");
+                } catch (err) {
+                  setError(err.message);
+                }
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   </>;

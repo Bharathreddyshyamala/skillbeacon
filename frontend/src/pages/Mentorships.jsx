@@ -10,7 +10,7 @@ import {
   
   import {
     useAuth,
-  } from "../AuthContext";
+  } from "../useAuth";
   
   
   const EMPTY_REQUEST = {

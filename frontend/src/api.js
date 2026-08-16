@@ -13,9 +13,18 @@ const API_URL = (
     }
   }
   
-  export function saveTokens(accessToken, refreshToken) {
-    localStorage.setItem(ACCESS_KEY, accessToken);
-    localStorage.setItem(REFRESH_KEY, refreshToken);
+  export function saveTokens(accessToken, refreshToken = null) {
+    if (accessToken) {
+      localStorage.setItem(ACCESS_KEY, accessToken);
+    } else {
+      localStorage.removeItem(ACCESS_KEY);
+    }
+  
+    if (refreshToken) {
+      localStorage.setItem(REFRESH_KEY, refreshToken);
+    } else {
+      localStorage.removeItem(REFRESH_KEY);
+    }
   }
   
   export function clearTokens() {

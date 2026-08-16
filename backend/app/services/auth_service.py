@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 from fastapi import HTTPException, status
+from argon2 import PasswordHasher
+from argon2.exceptions import InvalidHash, VerifyMismatchError
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -8,11 +11,11 @@ from app.core.config import settings
 from app.core.security import (
     create_access_token,
     generate_refresh_token,
-    hash_password,
+    get_or_create_user_from_neon,
     hash_refresh_token,
-    verify_password,
+    validate_neon_session,
 )
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.repositories.refresh_token_repository import (
     create_refresh_token,
     get_refresh_token_by_hash,
@@ -31,6 +34,9 @@ from app.schemas.auth_schema import (
 )
 
 
+password_hasher = PasswordHasher()
+
+
 def register_user(
     db: Session,
     request: RegisterRequest,
@@ -46,7 +52,7 @@ def register_user(
     user = create_user(
         db=db,
         email=request.email,
-        password_hash=hash_password(request.password),
+        password_hash=password_hasher.hash(request.password),
         role=request.role,
     )
 
@@ -99,14 +105,25 @@ def authenticate_user(
 ) -> TokenResponse:
     user = get_user_by_email(db, request.email)
 
-    if user is None or not verify_password(
-        request.password,
-        user.password_hash,
-    ):
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect email or password. Please sign in with Neon Auth.",
         )
+
+    if user.password_hash is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password. Please sign in with Neon Auth.",
+        )
+
+    try:
+        password_hasher.verify(user.password_hash, request.password)
+    except (VerifyMismatchError, InvalidHash) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password. Please sign in with Neon Auth.",
+        ) from exc
 
     if not user.is_active:
         raise HTTPException(
@@ -115,6 +132,32 @@ def authenticate_user(
         )
 
     return _issue_tokens(db, user)
+
+
+def sync_neon_user_session(
+    db: Session,
+    session_token: str,
+    desired_role: Optional[UserRole] = None,
+) -> User:
+    neon_user = validate_neon_session(db, session_token)
+    if neon_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired Neon Auth session",
+        )
+
+    user = get_or_create_user_from_neon(
+        db=db,
+        neon_user_data=neon_user,
+        desired_role=desired_role,
+    )
+
+    if desired_role and user.role != desired_role:
+        user.role = desired_role
+        db.commit()
+        db.refresh(user)
+
+    return user
 
 
 def refresh_user_tokens(

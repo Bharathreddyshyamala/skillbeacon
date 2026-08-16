@@ -27,3 +27,11 @@ frontend/.env
 backend/uploads/**
 !backend/uploads/resumes/
 !backend/uploads/resumes/.gitkeep
+.env.local
+.neon
+.agents/
+skills-lock.json
+conductor/
+
+
+
