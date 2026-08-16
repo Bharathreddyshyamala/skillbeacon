@@ -13,6 +13,8 @@ from app.models.base import Base, TimestampMixin
 
 
 if TYPE_CHECKING:
+    from app.models.document import Document
+    from app.models.notification import Notification
     from app.models.profile import (
         EmployerProfile,
         MentorProfile,
@@ -51,9 +53,9 @@ class User(TimestampMixin, Base):
         index=True,
     )
 
-    password_hash: Mapped[str] = mapped_column(
+    password_hash: Mapped[Optional[str]] = mapped_column(
         String(255),
-        nullable=False,
+        nullable=True,
     )
 
     role: Mapped[UserRole] = mapped_column(
@@ -136,11 +138,17 @@ class User(TimestampMixin, Base):
     back_populates="employer",
     )
     challenge_submissions = relationship(
-    "ChallengeSubmission",
-    back_populates="student",
+        "ChallengeSubmission",
+        back_populates="student",
     )
-    notifications = relationship(
-    "Notification",
-    back_populates="user",
-    cascade="all, delete-orphan",
+    documents: Mapped[List["Document"]] = relationship(
+        "Document",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    notifications: Mapped[List["Notification"]] = relationship(
+        "Notification",
+        back_populates="user",
+        cascade="all, delete-orphan",
     )

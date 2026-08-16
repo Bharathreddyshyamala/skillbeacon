@@ -73,6 +73,8 @@ class StudentApplicationResponse(BaseModel):
 
     resume_available: bool
 
+    resume_url: Optional[str] = None
+
     created_at: datetime
 
     updated_at: datetime
@@ -115,6 +117,8 @@ class EmployerApplicationResponse(BaseModel):
     ]
 
     resume_available: bool
+
+    resume_url: Optional[str] = None
 
     employer_note: Optional[str]
 

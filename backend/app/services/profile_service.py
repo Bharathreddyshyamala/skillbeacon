@@ -217,84 +217,22 @@ async def upload_student_resume(
             detail="Only students can upload resumes",
         )
 
-    original_name = upload.filename or ""
-    extension = Path(original_name).suffix.lower()
-
-    if extension not in ALLOWED_RESUME_EXTENSIONS:
+    file_bytes = await upload.read()
+    if not file_bytes:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Resume must be a PDF or DOCX file",
+            detail="Cannot upload an empty file",
         )
 
-    if (
-        upload.content_type
-        and upload.content_type not in ALLOWED_RESUME_CONTENT_TYPES
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unsupported resume content type",
-        )
+    from app.services.storage_service import replace_student_resume
 
-    resume_directory = settings.upload_root / "resumes"
-    resume_directory.mkdir(parents=True, exist_ok=True)
-
-    stored_name = f"{user.id}_{uuid4().hex}{extension}"
-    destination = resume_directory / stored_name
-
-    maximum_bytes = settings.max_upload_size_mb * 1024 * 1024
-    total_bytes = 0
-
-    try:
-        with destination.open("wb") as output:
-            while True:
-                chunk = await upload.read(1024 * 1024)
-
-                if not chunk:
-                    break
-
-                total_bytes += len(chunk)
-
-                if total_bytes > maximum_bytes:
-                    raise HTTPException(
-                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                        detail=(
-                            "Resume is larger than "
-                            f"{settings.max_upload_size_mb} MB"
-                        ),
-                    )
-
-                output.write(chunk)
-    except Exception:
-        destination.unlink(missing_ok=True)
-        raise
-    finally:
-        await upload.close()
+    replace_student_resume(
+        db=db,
+        user=user,
+        file_bytes=file_bytes,
+        file_name=upload.filename or "resume.pdf",
+        content_type=upload.content_type or "application/pdf",
+    )
 
     profile = get_profile_for_user(db, user)
-
-    if profile is None:
-        profile = create_profile_for_user(db, user)
-
-    if not isinstance(profile, StudentProfile):
-        destination.unlink(missing_ok=True)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Student profile is unavailable",
-        )
-
-    previous_path = profile.resume_path
-
-    relative_path = destination.relative_to(
-        settings.upload_root.parent
-    )
-    profile.resume_path = str(relative_path)
-
-    db.commit()
-    db.refresh(profile)
-
-    if previous_path:
-        previous_file = settings.upload_root.parent / previous_path
-        if previous_file != destination:
-            previous_file.unlink(missing_ok=True)
-
     return build_profile_envelope(user, profile)

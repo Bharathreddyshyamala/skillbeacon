@@ -124,6 +124,32 @@ import {
     }
   
   
+    async function viewResume(
+      applicationId,
+    ) {
+      setError("");
+      try {
+        const data = await apiRequest(
+          `/applications/${applicationId}/resume`
+        );
+        if (data?.download_url) {
+          window.open(
+            data.download_url,
+            "_blank",
+            "noopener,noreferrer"
+          );
+        } else {
+          setError("No download link available.");
+        }
+      } catch (requestError) {
+        setError(
+          requestError.message ||
+          "Unable to view résumé."
+        );
+      }
+    }
+  
+  
     function badgeClass(status) {
   
       switch (status) {
@@ -319,6 +345,22 @@ import {
                   }
                 </div>
               </div>
+  
+              {item.resume_available && (
+                <div className="col-12 mt-3 pt-2 border-top border-secondary border-opacity-25">
+                  <button
+                    type="button"
+                    className="btn btn-outline-info btn-sm"
+                    onClick={() =>
+                      viewResume(
+                        item.id
+                      )
+                    }
+                  >
+                    View Submitted Résumé
+                  </button>
+                </div>
+              )}
   
             </div>
   

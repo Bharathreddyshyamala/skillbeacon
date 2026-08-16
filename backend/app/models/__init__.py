@@ -43,10 +43,12 @@ from app.models.challenge import (
     ChallengeSubmissionStatus,
     ChallengeType,
 )
-from app.models.notification import Notification
-from app.models.admin_audit_log import (
-    AdminAuditLog,
+from app.models.document import (
+    Document,
+    DocumentType,
 )
+from app.models.notification import Notification
+from app.models.admin_audit_log import AdminAuditLog
 
 
 __all__ = [
@@ -57,4 +59,8 @@ __all__ = [
     "StudentProfile",
     "EmployerProfile",
     "MentorProfile",
+    "Document",
+    "DocumentType",
+    "Notification",
+    "AdminAuditLog",
 ]

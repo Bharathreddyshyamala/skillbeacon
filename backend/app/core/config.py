@@ -26,6 +26,19 @@ class Settings(BaseSettings):
     upload_directory: str = "uploads"
     max_upload_size_mb: int = 5
 
+    neon_auth_base_url: str
+    neon_auth_jwks_url: str
+
+    # Cloudflare R2 / S3 Object Storage
+    cloudflare_account_id: str
+    r2_endpoint_url: str
+    r2_access_key_id: str
+    r2_secret_access_key: str
+    r2_bucket_name: str
+    r2_public_base_url: str
+    user_storage_quota_mb: int = 50
+    employer_storage_quota_mb: int = 100
+
     model_config = SettingsConfigDict(
         env_file=ENV_FILE_PATH,
         env_file_encoding="utf-8",

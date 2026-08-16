@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from pydantic import (
@@ -48,6 +49,11 @@ class RefreshRequest(BaseModel):
 
 class LogoutRequest(BaseModel):
     refresh_token: str = Field(min_length=20)
+
+
+class SyncNeonSessionRequest(BaseModel):
+    session_token: str
+    role: Optional[UserRole] = None
 
 
 class UserResponse(BaseModel):
