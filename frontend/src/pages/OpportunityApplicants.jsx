@@ -483,7 +483,7 @@ import {
                       )
                     }
                   >
-                    View / Download Résumé
+                    View / Download Resume
                   </button>
                 </div>
               )}

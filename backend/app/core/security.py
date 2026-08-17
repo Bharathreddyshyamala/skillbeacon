@@ -6,13 +6,34 @@ from uuid import UUID
 
 import jwt
 from jwt.exceptions import InvalidTokenError
+from pwdlib import PasswordHash
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.models.user import User, UserRole
 from app.repositories.profile_repository import create_profile_for_user
-from app.repositories.user_repository import create_user, get_user_by_email
+from app.repositories.user_repository import (
+    create_user,
+    get_user_by_email,
+)
+
+
+password_hasher = PasswordHash.recommended()
+
+
+def hash_password(password: str) -> str:
+    return password_hasher.hash(password)
+
+
+def verify_password(
+    plain_password: str,
+    hashed_password: str,
+) -> bool:
+    return password_hasher.verify(
+        plain_password,
+        hashed_password,
+    )
 
 
 def create_access_token(

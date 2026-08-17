@@ -11,6 +11,8 @@ from app.api.routes.profile_routes import router as profile_router
 from app.api.routes.skill_routes import router as skill_router
 from app.api.routes.notification_routes import router as notifications_router
 from app.api.routes.admin_routes import router as admin_router
+from app.api.routes.sample_data_routes import router as sample_data_router
+
 
 api_router = APIRouter()
 
@@ -25,3 +27,4 @@ api_router.include_router(challenge_router)
 api_router.include_router(document_router)
 api_router.include_router(notifications_router)
 api_router.include_router(admin_router)
+api_router.include_router(sample_data_router)

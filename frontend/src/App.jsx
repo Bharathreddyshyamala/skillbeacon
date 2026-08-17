@@ -33,6 +33,8 @@ import AdminContent
 import AdminAuditLogs
   from "./pages/admin/AdminAuditLogs";
 
+import AdminSampleData from "./pages/admin/AdminSampleData";
+
 export default function App() {
   return (
     <Routes>
@@ -63,10 +65,9 @@ export default function App() {
           <Route path="/app/admin/users" element={<RoleRoute roles={["admin"]}> <AdminUsers /> </RoleRoute>}/>
           <Route path="/app/admin/content" element={<RoleRoute roles={["admin"]}> <AdminContent /> </RoleRoute>}/>
           <Route path="/app/admin/audit-logs" element={<RoleRoute roles={["admin"]}> <AdminAuditLogs /> </RoleRoute>}/>
+          <Route path="/app/admin/sample-data" element={<RoleRoute roles={["admin"]}> <AdminSampleData /> </RoleRoute>}/>
         </Route>
       </Route>
-
-
-    </Routes>
+      </Routes>
   );
 }

@@ -92,7 +92,6 @@ export default function Layout() {
       setUnreadNotifications(
         result?.unread_count || 0
       );
-
     } catch (error) {
       console.error(
         "Failed to load unread notifications:",
@@ -286,6 +285,15 @@ export default function Layout() {
                   to="/app/admin/audit-logs"
                 >
                   Audit Logs
+                </NavLink>
+              )}
+
+              {canUseAdmin && (
+                <NavLink
+                  className="nav-link"
+                  to="/app/admin/sample-data"
+                >
+                  Sample Data
                 </NavLink>
               )}
 
