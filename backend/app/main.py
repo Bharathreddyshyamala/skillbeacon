@@ -11,13 +11,21 @@ app = FastAPI(
     description="SkillBeacon career-development platform API",
 )
 
+
+origins = [
+    "http://localhost:5173",
+    settings.frontend_url,
+]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(
     api_router,
