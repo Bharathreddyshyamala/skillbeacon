@@ -46,7 +46,13 @@ export function AuthProvider({ children }) {
         return syncedUser;
       }
 
-      // 2. Fallback: check if we have a token or if local auth bypass is enabled on backend
+      // 2. Fallback: check if we have an existing local token
+      const localToken = localStorage.getItem("skillbeacon_access_token");
+      if (!localToken) {
+        setUser(null);
+        return null;
+      }
+
       try {
         const currentUser = await apiRequest("/auth/me");
         if (currentUser && currentUser.id) {
