@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BACKEND_DIRECTORY = Path(__file__).resolve().parents[2]
 
 ENV_FILE_PATH = BACKEND_DIRECTORY / ".env"
+LOCAL_ENV_FILE_PATH = BACKEND_DIRECTORY / ".env.local"
 
 
 class Settings(BaseSettings):
@@ -16,6 +17,7 @@ class Settings(BaseSettings):
     debug: bool = True
 
     database_url: str
+    database_url_unpooled: str | None = None
 
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
@@ -39,12 +41,18 @@ class Settings(BaseSettings):
     user_storage_quota_mb: int = 50
     employer_storage_quota_mb: int = 100
 
+    app_profile: str = "main"
+
     model_config = SettingsConfigDict(
-        env_file=ENV_FILE_PATH,
+        env_file=(ENV_FILE_PATH, LOCAL_ENV_FILE_PATH),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
     )
+
+    @property
+    def is_local_profile(self) -> bool:
+        return self.app_profile.strip().lower() == "local"
 
     @property
     def cors_origins(self) -> List[str]:

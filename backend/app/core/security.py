@@ -158,7 +158,8 @@ def get_or_create_user_from_neon(
     user.is_verified = True
 
     try:
-        create_profile_for_user(db, user)
+        if assigned_role in {UserRole.STUDENT, UserRole.EMPLOYER, UserRole.MENTOR}:
+            create_profile_for_user(db, user)
         db.commit()
         db.refresh(user)
     except Exception:
@@ -166,3 +167,6 @@ def get_or_create_user_from_neon(
         raise
 
     return user
+
+
+

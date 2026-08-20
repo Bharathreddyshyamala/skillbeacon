@@ -6,6 +6,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import (
     decode_access_token,
@@ -13,7 +14,7 @@ from app.core.security import (
     validate_neon_session,
 )
 from app.models.user import User, UserRole
-from app.repositories.user_repository import get_user_by_id
+from app.repositories.user_repository import get_user_by_email, get_user_by_id
 
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -58,6 +59,37 @@ def get_current_user(
     )
 
     raw_token = extract_token_from_request(request, credentials)
+
+    # 1. Local profile explicit identity headers (X-User-Id or X-User-Email)
+    if settings.is_local_profile:
+        user_id_hdr = request.headers.get("X-User-Id")
+        if user_id_hdr:
+            try:
+                user = get_user_by_id(db, UUID(user_id_hdr.strip()))
+                if user is not None:
+                    if not user.is_active:
+                        raise HTTPException(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            detail="User account is inactive",
+                        )
+                    return user
+            except (ValueError, TypeError):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid UUID format in X-User-Id header",
+                )
+
+        email_hdr = request.headers.get("X-User-Email")
+        if email_hdr:
+            user = get_user_by_email(db, email_hdr.strip())
+            if user is not None:
+                if not user.is_active:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="User account is inactive",
+                    )
+                return user
+
     if not raw_token:
         raise credentials_exception
 
@@ -101,12 +133,14 @@ def require_roles(*allowed_roles: UserRole) -> Callable:
     def role_checker(
         current_user: User = Depends(get_current_user),
     ) -> User:
-        if current_user.role not in allowed_roles:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You do not have permission to perform this action",
-            )
+        if current_user.role == UserRole.ADMIN or current_user.role in allowed_roles:
+            return current_user
 
-        return current_user
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to perform this action",
+        )
 
     return role_checker
+
+
