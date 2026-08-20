@@ -53,18 +53,9 @@ export function AuthProvider({ children }) {
         return null;
       }
 
-      try {
-        const currentUser = await apiRequest("/auth/me");
-        if (currentUser && currentUser.id) {
-          setUser(currentUser);
-          return currentUser;
-        }
-      } catch {
-        // Not authenticated
-      }
-
-      setUser(null);
-      return null;
+      const currentUser = await apiRequest("/auth/me");
+      setUser(currentUser);
+      return currentUser;
     } catch {
       clearTokens();
       setUser(null);
