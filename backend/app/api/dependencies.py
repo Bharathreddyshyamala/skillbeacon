@@ -47,6 +47,23 @@ def extract_token_from_request(
     return None
 
 
+def resolve_local_user(db: Session, identifier: Optional[str]) -> Optional[User]:
+    """
+    Resolve a user by email or UUID identifier for local development.
+    """
+    if not identifier:
+        return None
+
+    cleaned = identifier.strip()
+    if "@" in cleaned:
+        return get_user_by_email(db, cleaned)
+
+    try:
+        return get_user_by_id(db, UUID(cleaned))
+    except (ValueError, TypeError):
+        return None
+
+
 def get_current_user(
     request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
@@ -60,58 +77,21 @@ def get_current_user(
 
     raw_token = extract_token_from_request(request, credentials)
 
-    # 1. Local profile explicit identity headers (X-User-Id or X-User-Email)
+    # 1. Local profile identity resolution (X-User-Id, X-User-Email, or Bearer <email|uuid>)
     if settings.is_local_profile:
-        user_id_hdr = request.headers.get("X-User-Id")
-        if user_id_hdr:
-            try:
-                user = get_user_by_id(db, UUID(user_id_hdr.strip()))
-                if user is not None:
-                    if not user.is_active:
-                        raise HTTPException(
-                            status_code=status.HTTP_403_FORBIDDEN,
-                            detail="User account is inactive",
-                        )
-                    return user
-            except (ValueError, TypeError):
+        local_identifier = (
+            request.headers.get("X-User-Id")
+            or request.headers.get("X-User-Email")
+            or raw_token
+        )
+        user = resolve_local_user(db, local_identifier)
+        if user is not None:
+            if not user.is_active:
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Invalid UUID format in X-User-Id header",
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="User account is inactive",
                 )
-
-        email_hdr = request.headers.get("X-User-Email")
-        if email_hdr:
-            user = get_user_by_email(db, email_hdr.strip())
-            if user is not None:
-                if not user.is_active:
-                    raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        detail="User account is inactive",
-                    )
-                return user
-
-        # Swagger UI Authorize box (Bearer <email> or Bearer <uuid>)
-        if raw_token:
-            if "@" in raw_token:
-                user = get_user_by_email(db, raw_token.strip())
-                if user is not None:
-                    if not user.is_active:
-                        raise HTTPException(
-                            status_code=status.HTTP_403_FORBIDDEN,
-                            detail="User account is inactive",
-                        )
-                    return user
-            try:
-                user = get_user_by_id(db, UUID(raw_token.strip()))
-                if user is not None:
-                    if not user.is_active:
-                        raise HTTPException(
-                            status_code=status.HTTP_403_FORBIDDEN,
-                            detail="User account is inactive",
-                        )
-                    return user
-            except (ValueError, TypeError):
-                pass
+            return user
 
     if not raw_token:
         raise credentials_exception
