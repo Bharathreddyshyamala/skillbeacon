@@ -90,16 +90,28 @@ def get_current_user(
                     )
                 return user
 
-        # Swagger UI Authorize box (Bearer <email>)
-        if raw_token and "@" in raw_token:
-            user = get_user_by_email(db, raw_token.strip())
-            if user is not None:
-                if not user.is_active:
-                    raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        detail="User account is inactive",
-                    )
-                return user
+        # Swagger UI Authorize box (Bearer <email> or Bearer <uuid>)
+        if raw_token:
+            if "@" in raw_token:
+                user = get_user_by_email(db, raw_token.strip())
+                if user is not None:
+                    if not user.is_active:
+                        raise HTTPException(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            detail="User account is inactive",
+                        )
+                    return user
+            try:
+                user = get_user_by_id(db, UUID(raw_token.strip()))
+                if user is not None:
+                    if not user.is_active:
+                        raise HTTPException(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            detail="User account is inactive",
+                        )
+                    return user
+            except (ValueError, TypeError):
+                pass
 
     if not raw_token:
         raise credentials_exception
