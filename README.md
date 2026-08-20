@@ -325,6 +325,22 @@ python -c "import secrets; print(secrets.token_urlsafe(64))"
 
 Never commit the real `.env` file.
 
+### Local Development Profile (.env.local)
+
+To enable local developer testing without token authentication:
+
+1. Copy the local template:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+2. When `APP_PROFILE=local` is active:
+   - You can test any endpoint directly in Swagger UI (`/docs`), Postman, or cURL without logging in by passing `X-User-Email` or `X-User-Id`:
+     ```bash
+     curl -X GET "http://127.0.0.1:8000/api/v1/profiles/me" \
+          -H "X-User-Email: user@example.com"
+     ```
+   - (Optional) You can override `DATABASE_URL` in `.env.local` to point to an isolated Neon development branch.
+
 ## 9. Apply migrations
 
 ```bash

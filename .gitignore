@@ -28,6 +28,7 @@ backend/uploads/**
 !backend/uploads/resumes/
 !backend/uploads/resumes/.gitkeep
 .env.local
+backend/.env.local
 .neon
 .agents/
 skills-lock.json
