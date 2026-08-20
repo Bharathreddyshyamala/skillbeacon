@@ -133,7 +133,7 @@ def require_roles(*allowed_roles: UserRole) -> Callable:
     def role_checker(
         current_user: User = Depends(get_current_user),
     ) -> User:
-        if current_user.role == UserRole.ADMIN or current_user.role in allowed_roles:
+        if current_user.role in allowed_roles:
             return current_user
 
         raise HTTPException(
