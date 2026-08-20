@@ -49,6 +49,11 @@ from app.models.document import (
 )
 from app.models.notification import Notification
 from app.models.admin_audit_log import AdminAuditLog
+from app.models.sample_data import (
+    SampleDataBatch,
+    SampleDataObject,
+    SampleDataRecord,
+)
 
 
 __all__ = [
