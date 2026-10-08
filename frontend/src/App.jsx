@@ -34,6 +34,8 @@ import AdminAuditLogs
   from "./pages/admin/AdminAuditLogs";
 
 import AdminSampleData from "./pages/admin/AdminSampleData";
+import AdminJobIngestion
+  from "./pages/admin/AdminJobIngestion";
 
 export default function App() {
   return (
@@ -66,6 +68,7 @@ export default function App() {
           <Route path="/app/admin/content" element={<RoleRoute roles={["admin"]}> <AdminContent /> </RoleRoute>}/>
           <Route path="/app/admin/audit-logs" element={<RoleRoute roles={["admin"]}> <AdminAuditLogs /> </RoleRoute>}/>
           <Route path="/app/admin/sample-data" element={<RoleRoute roles={["admin"]}> <AdminSampleData /> </RoleRoute>}/>
+          <Route path="/app/admin/job-ingestion" element={<RoleRoute roles={["admin"]}> <AdminJobIngestion /> </RoleRoute>}/>
         </Route>
       </Route>
       </Routes>

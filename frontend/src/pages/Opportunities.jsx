@@ -1,832 +1,1079 @@
 import {
-    useEffect,
-    useState,
-  } from "react";
-  
-  import {
-    useNavigate,
-  } from "react-router";
-  
-  import {
-    apiRequest,
-    jsonBody,
-  } from "../api";
-  
-  
-  export default function Opportunities() {
-  
-  
-    const navigate =
-      useNavigate();
-  
-  
-  
-    const [items, setItems] =
-      useState([]);
-  
-  
-  
-    const [
-      applications,
-      setApplications,
-    ] = useState([]);
-  
-  
-    const [
-      applyingId,
-      setApplyingId,
-    ] = useState("");
-  
-  
-    const [
-      coverLetter,
-      setCoverLetter,
-    ] = useState("");
-  
-  
-    const [
-      profile,
-      setProfile,
-    ] = useState(null);
-  
-  
-    const [
-      mySkills,
-      setMySkills,
-    ] = useState([]);
-  
-  
-  
-    const [search, setSearch] =
-      useState("");
-  
-  
-    const [workMode, setWorkMode] =
-      useState("");
-  
-  
-    const [
-      opportunityType,
-      setOpportunityType,
-    ] = useState("");
-  
-  
-  
-    const [loading, setLoading] =
-      useState(true);
-  
-  
-    const [submitting, setSubmitting] =
-      useState(false);
-  
-  
-    const [error, setError] =
-      useState("");
-  
-  
-    const [message, setMessage] =
-      useState("");
-  
-  
-  
-    async function loadOpportunities() {
-  
-      setLoading(true);
-  
-      setError("");
-  
-  
-      try {
-  
-  
-        const params =
-          new URLSearchParams();
-  
-  
-        if (search.trim()) {
-  
-          params.set(
-            "search",
-            search.trim()
-          );
-  
-        }
-  
-  
-        if (workMode) {
-  
-          params.set(
-            "work_mode",
-            workMode
-          );
-  
-        }
-  
-  
-        if (opportunityType) {
-  
-          params.set(
-            "opportunity_type",
-            opportunityType
-          );
-  
-        }
-  
-  
-        const query =
-          params.toString();
-  
-  
-  
-        const [
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  useNavigate,
+} from "react-router";
+
+import {
+  apiRequest,
+  jsonBody,
+} from "../api";
+
+import {
+  getExternalJobs,
+} from "../services/externalJobsApi";
+
+
+export default function Opportunities() {
+
+  const navigate =
+    useNavigate();
+
+
+  /*
+   * Existing SkillBeacon opportunities
+   */
+
+  const [
+    items,
+    setItems,
+  ] = useState([]);
+
+
+  /*
+   * NEW:
+   * External ingested jobs
+   */
+
+  const [
+    externalJobs,
+    setExternalJobs,
+  ] = useState([]);
+
+  const [
+    externalTotal,
+    setExternalTotal,
+  ] = useState(0);
+
+  const [
+    externalLoading,
+    setExternalLoading,
+  ] = useState(false);
+
+  const [
+    externalError,
+    setExternalError,
+  ] = useState("");
+
+
+  /*
+   * Existing student/application data
+   */
+
+  const [
+    applications,
+    setApplications,
+  ] = useState([]);
+
+  const [
+    applyingId,
+    setApplyingId,
+  ] = useState("");
+
+  const [
+    coverLetter,
+    setCoverLetter,
+  ] = useState("");
+
+  const [
+    profile,
+    setProfile,
+  ] = useState(null);
+
+  const [
+    mySkills,
+    setMySkills,
+  ] = useState([]);
+
+
+  /*
+   * Existing filters
+   */
+
+  const [
+    search,
+    setSearch,
+  ] = useState("");
+
+  const [
+    workMode,
+    setWorkMode,
+  ] = useState("");
+
+  const [
+    opportunityType,
+    setOpportunityType,
+  ] = useState("");
+
+
+  /*
+   * Existing loading / messages
+   */
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    message,
+    setMessage,
+  ] = useState("");
+
+
+  /*
+   * Load internal SkillBeacon opportunities
+   */
+
+  async function loadOpportunities() {
+
+    setLoading(true);
+
+    setError("");
+
+    try {
+
+      const params =
+        new URLSearchParams();
+
+
+      if (search.trim()) {
+
+        params.set(
+          "search",
+          search.trim()
+        );
+      }
+
+
+      if (workMode) {
+
+        params.set(
+          "work_mode",
+          workMode
+        );
+      }
+
+
+      if (opportunityType) {
+
+        params.set(
+          "opportunity_type",
+          opportunityType
+        );
+      }
+
+
+      const query =
+        params.toString();
+
+
+      const [
+        opportunityResponse,
+        applicationResponse,
+        profileResponse,
+        skillsResponse,
+      ] = await Promise.all([
+
+        apiRequest(
+          `/opportunities${
+            query
+              ? `?${query}`
+              : ""
+          }`
+        ),
+
+        apiRequest(
+          "/applications/me?limit=100"
+        ),
+
+        apiRequest(
+          "/profiles/me"
+        ),
+
+        apiRequest(
+          "/skills/me"
+        ),
+
+      ]);
+
+
+      setItems(
+        Array.isArray(
+          opportunityResponse
+        )
+          ? opportunityResponse
+          : []
+      );
+
+
+      setApplications(
+        Array.isArray(
+          applicationResponse?.items
+        )
+          ? applicationResponse.items
+          : []
+      );
+
+
+      setProfile(
+        profileResponse || null
+      );
+
+
+      setMySkills(
+        Array.isArray(
+          skillsResponse
+        )
+          ? skillsResponse
+          : []
+      );
+
+
+    } catch (requestError) {
+
+      setError(
+        requestError.message ||
+        "Unable to load opportunities."
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
+  }
+
+
+  /*
+   * NEW:
+   * Load external jobs from external_jobs table
+   */
+
+  async function loadExternalJobs(
+    searchValue = search
+  ) {
+
+    setExternalLoading(true);
+
+    setExternalError("");
+
+    try {
+
+      const response =
+        await getExternalJobs({
+          search:
+            searchValue.trim(),
+          company: "Amazon",
+          sort: "source",
+          page: 1,
+          pageSize: 50,
+        });
+
+
+      setExternalJobs(
+        Array.isArray(
+          response?.items
+        )
+          ? response.items
+          : []
+      );
+
+
+      setExternalTotal(
+        response?.total || 0
+      );
+
+
+    } catch (requestError) {
+
+      console.error(
+        "Unable to load external jobs:",
+        requestError
+      );
+
+
+      setExternalError(
+        requestError.message ||
+        "Unable to load external opportunities."
+      );
+
+
+      setExternalJobs([]);
+
+      setExternalTotal(0);
+
+    } finally {
+
+      setExternalLoading(false);
+    }
+  }
+
+
+  /*
+   * Initial page load
+   */
+
+  useEffect(() => {
+
+    loadOpportunities();
+
+    loadExternalJobs("");
+
+  }, []);
+
+
+  /*
+   * Search both internal and external jobs
+   */
+
+  async function handleSearch(
+    event
+  ) {
+
+    event.preventDefault();
+
+    await Promise.all([
+      loadOpportunities(),
+      loadExternalJobs(search),
+    ]);
+  }
+
+
+  /*
+   * Clear all filters and reload everything
+   */
+
+  function clearFilters() {
+
+    setSearch("");
+
+    setWorkMode("");
+
+    setOpportunityType("");
+
+    setLoading(true);
+
+    setExternalLoading(true);
+
+    setError("");
+
+    setExternalError("");
+
+
+    Promise.all([
+
+      apiRequest(
+        "/opportunities"
+      ),
+
+      apiRequest(
+        "/applications/me?limit=100"
+      ),
+
+      apiRequest(
+        "/profiles/me"
+      ),
+
+      apiRequest(
+        "/skills/me"
+      ),
+
+      getExternalJobs({
+        company: "Amazon",
+        sort: "source",
+        page: 1,
+        pageSize: 50,
+      }),
+
+    ])
+      .then(
+        ([
           opportunityResponse,
           applicationResponse,
           profileResponse,
           skillsResponse,
-        ] = await Promise.all([
-  
-          apiRequest(
-            `/opportunities${
-              query
-                ? `?${query}`
-                : ""
-            }`
-          ),
-  
-          apiRequest(
-            "/applications/me?limit=100"
-          ),
-  
-          apiRequest(
-            "/profiles/me"
-          ),
-  
-          apiRequest(
-            "/skills/me"
-          ),
-  
-        ]);
-  
-  
-  
-        setItems(
-          Array.isArray(
-            opportunityResponse
-          )
-            ? opportunityResponse
-            : []
-        );
-  
-  
-  
-        setApplications(
-          Array.isArray(
-            applicationResponse?.items
-          )
-            ? applicationResponse.items
-            : []
-        );
-  
-  
-  
-        setProfile(
-          profileResponse || null
-        );
-  
-  
-  
-        setMySkills(
-          Array.isArray(
-            skillsResponse
-          )
-            ? skillsResponse
-            : []
-        );
-  
-  
-      } catch (requestError) {
-  
-        setError(
-          requestError.message ||
-          "Unable to load opportunities."
-        );
-  
-      } finally {
-  
-        setLoading(false);
-  
-      }
-    }
-  
-  
-  
-    useEffect(() => {
-  
-      loadOpportunities();
-  
-    }, []);
-  
-  
-  
-    function handleSearch(event) {
-  
-      event.preventDefault();
-  
-      loadOpportunities();
-  
-    }
-  
-  
-  
-    function clearFilters() {
-  
-      setSearch("");
-  
-      setWorkMode("");
-  
-      setOpportunityType("");
-  
-  
-  
-      setLoading(true);
-  
-      setError("");
-  
-  
-      Promise.all([
-  
-        apiRequest(
-          "/opportunities"
-        ),
-  
-        apiRequest(
-          "/applications/me?limit=100"
-        ),
-  
-        apiRequest(
-          "/profiles/me"
-        ),
-  
-        apiRequest(
-          "/skills/me"
-        ),
-  
-      ])
-        .then(
-          ([
-            opportunityResponse,
-            applicationResponse,
-            profileResponse,
-            skillsResponse,
-          ]) => {
-  
-            setItems(
-              Array.isArray(
-                opportunityResponse
-              )
-                ? opportunityResponse
-                : []
-            );
-  
-  
-            setApplications(
-              Array.isArray(
-                applicationResponse?.items
-              )
-                ? applicationResponse.items
-                : []
-            );
-  
-  
-            setProfile(
-              profileResponse || null
-            );
-  
-  
-            setMySkills(
-              Array.isArray(
-                skillsResponse
-              )
-                ? skillsResponse
-                : []
-            );
-  
-          }
-        )
-        .catch(
-          (requestError) => {
-  
-            setError(
-              requestError.message ||
-              "Unable to load opportunities."
-            );
-  
-          }
-        )
-        .finally(
-          () => {
-  
-            setLoading(false);
-  
-          }
-        );
-    }
-  
-  
-  
-    function existingApplication(
-      opportunityId,
-    ) {
-  
-      return applications.find(
-        (application) =>
-          application.opportunity_id
-          === opportunityId
+          externalResponse,
+        ]) => {
+
+
+          setItems(
+            Array.isArray(
+              opportunityResponse
+            )
+              ? opportunityResponse
+              : []
+          );
+
+
+          setApplications(
+            Array.isArray(
+              applicationResponse?.items
+            )
+              ? applicationResponse.items
+              : []
+          );
+
+
+          setProfile(
+            profileResponse || null
+          );
+
+
+          setMySkills(
+            Array.isArray(
+              skillsResponse
+            )
+              ? skillsResponse
+              : []
+          );
+
+
+          setExternalJobs(
+            Array.isArray(
+              externalResponse?.items
+            )
+              ? externalResponse.items
+              : []
+          );
+
+
+          setExternalTotal(
+            externalResponse?.total || 0
+          );
+
+        }
+      )
+      .catch(
+        (requestError) => {
+
+          setError(
+            requestError.message ||
+            "Unable to load opportunities."
+          );
+
+        }
+      )
+      .finally(
+        () => {
+
+          setLoading(false);
+
+          setExternalLoading(false);
+
+        }
       );
-    }
-  
-  
-  
-    function toggleApplyForm(
-      opportunityId,
-    ) {
-  
-      setError("");
-  
-      setMessage("");
-  
-  
-      if (
-        applyingId
+  }
+
+
+  /*
+   * Existing internal application helpers
+   */
+
+  function existingApplication(
+    opportunityId,
+  ) {
+
+    return applications.find(
+      (application) =>
+        application.opportunity_id
         === opportunityId
-      ) {
-  
-        setApplyingId("");
-  
-        setCoverLetter("");
-  
-        return;
-      }
-  
-  
-      setApplyingId(
+    );
+  }
+
+
+  function toggleApplyForm(
+    opportunityId,
+  ) {
+
+    setError("");
+
+    setMessage("");
+
+
+    if (
+      applyingId
+      === opportunityId
+    ) {
+
+      setApplyingId("");
+
+      setCoverLetter("");
+
+      return;
+    }
+
+
+    setApplyingId(
+      opportunityId
+    );
+
+
+    setCoverLetter("");
+  }
+
+
+  async function apply(
+    opportunityId,
+  ) {
+
+    setError("");
+
+    setMessage("");
+
+
+    const existing =
+      existingApplication(
         opportunityId
       );
-  
-  
-      setCoverLetter("");
-  
-    }
-  
-  
-  
-    async function apply(
-      opportunityId,
-    ) {
-  
-      setError("");
-  
-      setMessage("");
-  
-  
-  
-      const existing =
-        existingApplication(
-          opportunityId
-        );
-  
-  
-      if (existing) {
-  
-        setError(
-          "You already applied to this opportunity."
-        );
-  
-        return;
-      }
-  
-  
-      const confirmed =
-        window.confirm(
-          "Submit this application? Your current profile, skills, and résumé availability will be captured."
-        );
-  
-  
-      if (!confirmed) {
-  
-        return;
-  
-      }
-  
-  
-      setSubmitting(true);
-  
-  
-      try {
-  
-        await apiRequest(
-          "/applications",
-          {
-            method: "POST",
-  
-            body: jsonBody({
-  
-              opportunity_id:
-                opportunityId,
-  
-              cover_letter:
-                coverLetter.trim()
-                  || null,
-  
-            }),
-          }
-        );
-  
-  
-        setMessage(
-          "Application submitted successfully."
-        );
-  
-  
-        setApplyingId("");
-  
-        setCoverLetter("");
-  
-  
-  
-        await loadOpportunities();
-  
-  
-      } catch (requestError) {
-  
-        setError(
-          requestError.message ||
-          "Unable to submit application."
-        );
-  
-      } finally {
-  
-        setSubmitting(false);
-  
-      }
-    }
-  
-  
-  
-    function applicationBadgeClass(
-      status,
-    ) {
-  
-      switch (status) {
-  
-        case "accepted":
-  
-          return "text-bg-success";
-  
-  
-        case "rejected":
-  
-          return "text-bg-danger";
-  
-  
-        case "shortlisted":
-  
-          return "text-bg-info";
-  
-  
-        case "under_review":
-  
-          return "text-bg-warning";
-  
-  
-        case "withdrawn":
-  
-          return "text-bg-secondary";
-  
-  
-        default:
-  
-          return "text-bg-primary";
-  
-      }
-    }
-  
-  
-  
-  
-    const studentProfile =
-      profile?.profile
-      || profile
-      || {};
-  
-  
-    const resumeAvailable =
-      Boolean(
-        studentProfile?.resume_path
-        || studentProfile?.resume_available
+
+
+    if (existing) {
+
+      setError(
+        "You already applied to this opportunity."
       );
-  
-  
-    const studentName = [
-  
-      studentProfile?.first_name,
-  
-      studentProfile?.last_name,
-  
-    ]
-      .filter(Boolean)
-      .join(" ");
-  
-  
-  
+
+      return;
+    }
+
+
+    const confirmed =
+      window.confirm(
+        "Submit this application? Your current profile, skills, and résumé availability will be captured."
+      );
+
+
+    if (!confirmed) {
+
+      return;
+    }
+
+
+    setSubmitting(true);
+
+
+    try {
+
+      await apiRequest(
+        "/applications",
+        {
+          method: "POST",
+
+          body: jsonBody({
+
+            opportunity_id:
+              opportunityId,
+
+            cover_letter:
+              coverLetter.trim()
+                || null,
+
+          }),
+        }
+      );
+
+
+      setMessage(
+        "Application submitted successfully."
+      );
+
+
+      setApplyingId("");
+
+      setCoverLetter("");
+
+
+      await loadOpportunities();
+
+
+    } catch (requestError) {
+
+      setError(
+        requestError.message ||
+        "Unable to submit application."
+      );
+
+    } finally {
+
+      setSubmitting(false);
+    }
+  }
+
+
+  function applicationBadgeClass(
+    status,
+  ) {
+
+    switch (status) {
+
+      case "accepted":
+
+        return "text-bg-success";
+
+
+      case "rejected":
+
+        return "text-bg-danger";
+
+
+      case "shortlisted":
+
+        return "text-bg-info";
+
+
+      case "under_review":
+
+        return "text-bg-warning";
+
+
+      case "withdrawn":
+
+        return "text-bg-secondary";
+
+
+      default:
+
+        return "text-bg-primary";
+    }
+  }
+
+
+  /*
+   * Utility for external job descriptions
+   */
+
+  function truncateDescription(
+    description,
+    maxLength = 450,
+  ) {
+
+    if (!description) {
+
+      return "";
+    }
+
+
+    if (
+      description.length
+      <= maxLength
+    ) {
+
+      return description;
+    }
+
+
     return (
-      <>
-  
-  
-        <div className="mb-4">
-  
-          <p className="text-info fw-semibold text-uppercase">
-            Opportunities
-          </p>
-  
-  
-          <h1 className="display-6 fw-bold">
-            Discover Opportunities
-          </h1>
-  
-  
-          <p className="text-secondary">
-            Explore jobs, internships,
-            projects, and volunteer
-            opportunities.
-          </p>
-  
+      `${description.substring(
+        0,
+        maxLength
+      )}...`
+    );
+  }
+
+
+  /*
+   * Existing student profile data
+   */
+
+  const studentProfile =
+    profile?.profile
+    || profile
+    || {};
+
+
+  const resumeAvailable =
+    Boolean(
+      studentProfile?.resume_path
+      || studentProfile?.resume_available
+    );
+
+
+  const studentName = [
+
+    studentProfile?.first_name,
+
+    studentProfile?.last_name,
+
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+
+  return (
+    <>
+
+      {/* ================================== */}
+      {/* PAGE HEADER */}
+      {/* ================================== */}
+
+      <div className="mb-4">
+
+        <p className="text-info fw-semibold text-uppercase">
+          Opportunities
+        </p>
+
+
+        <h1 className="display-6 fw-bold">
+          Discover Opportunities
+        </h1>
+
+
+        <p className="text-secondary">
+          Explore SkillBeacon opportunities
+          and jobs from external company
+          career sites.
+        </p>
+
+      </div>
+
+
+      {/* ================================== */}
+      {/* GLOBAL MESSAGES */}
+      {/* ================================== */}
+
+      {message && (
+
+        <div className="alert alert-success">
+          {message}
         </div>
-  
-  
-  
-        {message && (
-  
-          <div className="alert alert-success">
-            {message}
-          </div>
-  
-        )}
-  
-  
-  
-        {error && (
-  
-          <div className="alert alert-danger">
-            {error}
-          </div>
-  
-        )}
-  
-  
-  
-        <div className="glass-card mb-4">
-  
-          <form
-            className="row g-3"
-            onSubmit={
-              handleSearch
-            }
-          >
-  
-  
-            <div className="col-lg-4">
-  
-              <label className="form-label">
-                Search
-              </label>
-  
-  
-              <input
-                className="form-control"
-                value={search}
-                onChange={(event) =>
-                  setSearch(
-                    event.target.value
-                  )
-                }
-                placeholder="Backend, Python, company..."
-              />
-  
-            </div>
-  
-  
-  
-            <div className="col-lg-3">
-  
-              <label className="form-label">
-                Work Mode
-              </label>
-  
-  
-              <select
-                className="form-select"
-                value={workMode}
-                onChange={(event) =>
-                  setWorkMode(
-                    event.target.value
-                  )
-                }
-              >
-  
-                <option value="">
-                  All
-                </option>
-  
-                <option value="remote">
-                  Remote
-                </option>
-  
-                <option value="hybrid">
-                  Hybrid
-                </option>
-  
-                <option value="onsite">
-                  Onsite
-                </option>
-  
-              </select>
-  
-            </div>
-  
-  
-  
-            <div className="col-lg-3">
-  
-              <label className="form-label">
-                Type
-              </label>
-  
-  
-              <select
-                className="form-select"
-                value={
-                  opportunityType
-                }
-                onChange={(event) =>
-                  setOpportunityType(
-                    event.target.value
-                  )
-                }
-              >
-  
-                <option value="">
-                  All
-                </option>
-  
-                <option value="job">
-                  Job
-                </option>
-  
-                <option value="internship">
-                  Internship
-                </option>
-  
-                <option value="project">
-                  Project
-                </option>
-  
-                <option value="volunteer">
-                  Volunteer
-                </option>
-  
-              </select>
-  
-            </div>
-  
-  
-  
-            <div className="col-lg-1 d-flex align-items-end">
-  
-              <button
-                className="btn btn-info w-100"
-                type="submit"
-              >
-                Go
-              </button>
-  
-            </div>
-  
-  
-  
-            <div className="col-lg-1 d-flex align-items-end">
-  
-              <button
-                className="btn btn-outline-secondary w-100"
-                type="button"
-                onClick={
-                  clearFilters
-                }
-              >
-                Clear
-              </button>
-  
-            </div>
-  
-          </form>
-  
+
+      )}
+
+
+      {error && (
+
+        <div className="alert alert-danger">
+          {error}
         </div>
-  
-  
-  
+
+      )}
+
+
+      {/* ================================== */}
+      {/* SEARCH / FILTER AREA */}
+      {/* ================================== */}
+
+      <div className="glass-card mb-5">
+
+        <form
+          className="row g-3"
+          onSubmit={
+            handleSearch
+          }
+        >
+
+
+          <div className="col-lg-4">
+
+            <label className="form-label">
+              Search
+            </label>
+
+
+            <input
+              className="form-control"
+              value={search}
+              onChange={(event) =>
+                setSearch(
+                  event.target.value
+                )
+              }
+              placeholder="Backend, Python, company..."
+            />
+
+          </div>
+
+
+          <div className="col-lg-3">
+
+            <label className="form-label">
+              Work Mode
+            </label>
+
+
+            <select
+              className="form-select"
+              value={workMode}
+              onChange={(event) =>
+                setWorkMode(
+                  event.target.value
+                )
+              }
+            >
+
+              <option value="">
+                All
+              </option>
+
+              <option value="remote">
+                Remote
+              </option>
+
+              <option value="hybrid">
+                Hybrid
+              </option>
+
+              <option value="onsite">
+                Onsite
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div className="col-lg-3">
+
+            <label className="form-label">
+              Type
+            </label>
+
+
+            <select
+              className="form-select"
+              value={
+                opportunityType
+              }
+              onChange={(event) =>
+                setOpportunityType(
+                  event.target.value
+                )
+              }
+            >
+
+              <option value="">
+                All
+              </option>
+
+              <option value="job">
+                Job
+              </option>
+
+              <option value="internship">
+                Internship
+              </option>
+
+              <option value="project">
+                Project
+              </option>
+
+              <option value="volunteer">
+                Volunteer
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div className="col-lg-1 d-flex align-items-end">
+
+            <button
+              className="btn btn-info w-100"
+              type="submit"
+            >
+              Go
+            </button>
+
+          </div>
+
+
+          <div className="col-lg-1 d-flex align-items-end">
+
+            <button
+              className="btn btn-outline-secondary w-100"
+              type="button"
+              onClick={
+                clearFilters
+              }
+            >
+              Clear
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+
+      {/* ================================== */}
+      {/* SKILLBEACON OPPORTUNITIES */}
+      {/* ================================== */}
+
+      <div className="mb-5">
+
+        <div
+          className="
+            d-flex
+            justify-content-between
+            align-items-center
+            flex-wrap
+            gap-3
+            mb-3
+          "
+        >
+
+          <div>
+
+            <p
+              className="
+                text-info
+                fw-semibold
+                text-uppercase
+                small
+                mb-1
+              "
+            >
+              SkillBeacon
+            </p>
+
+
+            <h2 className="h3 mb-1">
+              SkillBeacon Opportunities
+            </h2>
+
+
+            <p className="text-secondary mb-0">
+              Opportunities published directly
+              by employers on SkillBeacon.
+            </p>
+
+          </div>
+
+
+          {!loading && (
+            <span
+              className="
+                badge
+                rounded-pill
+                text-bg-info
+              "
+            >
+              {items.length} available
+            </span>
+          )}
+
+        </div>
+
+
         {loading && (
-  
+
           <p className="text-secondary">
-            Loading opportunities...
+            Loading SkillBeacon opportunities...
           </p>
-  
+
         )}
-  
-  
-  
+
+
         {
           !loading &&
-          !error &&
           items.length === 0 && (
-  
+
             <div className="glass-card">
-  
+
               <p className="text-secondary mb-0">
-                No open opportunities found.
+                No SkillBeacon opportunities found.
               </p>
-  
+
             </div>
-  
+
           )
         }
-  
-  
-  
+
+
         {
           !loading &&
           items.map(
             (item) => {
-  
+
               const application =
                 existingApplication(
                   item.id
                 );
-  
-  
+
+
               return (
-  
+
                 <div
                   key={item.id}
                   className="glass-card mb-4"
                 >
-  
-  
+
+
                   <div className="d-flex justify-content-between gap-3 flex-wrap">
-  
+
                     <div>
-  
-                      <p className="text-info text-uppercase small mb-1">
-  
-                        {
-                          item.opportunity_type
-                        }
-  
-                      </p>
-  
-  
+
+                      <div className="d-flex align-items-center gap-2 mb-1">
+
+                        <p className="text-info text-uppercase small mb-0">
+
+                          {
+                            item.opportunity_type
+                          }
+
+                        </p>
+
+
+                        <span
+                          className="
+                            badge
+                            rounded-pill
+                            text-bg-info
+                          "
+                        >
+                          SkillBeacon
+                        </span>
+
+                      </div>
+
+
                       <h2 className="h4 mb-1">
-  
+
                         {item.title}
-  
+
                       </h2>
-  
-  
+
+
                       <p className="text-secondary">
-  
+
                         {
                           item.company_name
                         }
-  
+
                       </p>
-  
+
                     </div>
-  
-  
+
+
                     <div className="d-flex flex-column align-items-end gap-2">
-  
+
                       <span className="badge text-bg-info text-capitalize">
-  
+
                         {
                           item.work_mode
                         }
-  
+
                       </span>
-  
-  
-  
+
+
                       {
                         application && (
-  
+
                           <span
                             className={
                               `badge ${
@@ -836,7 +1083,7 @@ import {
                               } text-capitalize`
                             }
                           >
-  
+
                             {
                               application.status
                                 .replaceAll(
@@ -844,56 +1091,53 @@ import {
                                   " "
                                 )
                             }
-  
+
                           </span>
-  
+
                         )
                       }
-  
+
                     </div>
-  
+
                   </div>
-  
-  
-  
+
+
                   <p>
                     {item.description}
                   </p>
-  
-  
-  
+
+
                   <div className="row small mb-3">
-  
-  
+
+
                     <div className="col-md-4">
-  
+
                       <span className="text-secondary">
                         Location
                       </span>
-  
-  
+
+
                       <div>
-  
+
                         {
                           item.location
                           || "Not specified"
                         }
-  
+
                       </div>
-  
+
                     </div>
-  
-  
-  
+
+
                     <div className="col-md-4">
-  
+
                       <span className="text-secondary">
                         Employment
                       </span>
-  
-  
+
+
                       <div className="text-capitalize">
-  
+
                         {
                           item.employment_type
                             ?.replaceAll(
@@ -902,95 +1146,92 @@ import {
                             )
                           || "Not specified"
                         }
-  
+
                       </div>
-  
+
                     </div>
-  
-  
-  
+
+
                     <div className="col-md-4">
-  
+
                       <span className="text-secondary">
                         Deadline
                       </span>
-  
-  
+
+
                       <div>
-  
+
                         {
                           item.deadline
                           || "Open"
                         }
-  
+
                       </div>
-  
+
                     </div>
-  
+
                   </div>
-  
-  
-  
+
+
                   {
                     (
                       item.salary_min
                       || item.salary_max
                     ) && (
-  
+
                       <p>
-  
+
                         <strong>
                           Compensation:
                         </strong>
-  
+
                         {" "}
-  
+
                         {item.currency}
-  
+
                         {" "}
-  
+
                         {
                           item.salary_min
                           ?? "—"
                         }
-  
+
                         {" - "}
-  
+
                         {
                           item.salary_max
                           ?? "—"
                         }
-  
+
                       </p>
-  
+
                     )
                   }
-  
-  
-  
+
+
                   <div className="mt-3">
-  
+
                     <h3 className="h6">
                       Required Skills
                     </h3>
-  
-  
+
+
                     {
                       (
                         item.skills
                         || []
                       ).length === 0 ? (
-  
+
                         <p className="small text-secondary">
-  
+
                           No required skills specified.
-  
+
                         </p>
-  
+
                       ) : (
-  
+
                         <div className="d-flex flex-wrap gap-2">
-  
+
                           {
                             (
                               item.skills
@@ -999,64 +1240,62 @@ import {
                               (
                                 requirement
                               ) => (
-  
+
                                 <span
                                   key={
                                     requirement.id
                                   }
                                   className="badge rounded-pill text-bg-secondary"
                                 >
-  
+
                                   {
                                     requirement
                                       .skill
                                       ?.name
                                   }
-  
+
                                   {" · "}
-  
+
                                   {
                                     requirement
                                       .minimum_level
                                   }
-  
+
                                 </span>
-  
+
                               )
                             )
                           }
-  
+
                         </div>
-  
+
                       )
                     }
-  
+
                   </div>
-  
-  
-  
+
+
                   <div className="mt-4">
-  
-  
-  
+
+
                     {
                       application ? (
-  
+
                         <div>
-  
+
                           <div className="alert alert-secondary py-2">
-  
+
                             You already applied to
                             this opportunity.
-  
+
                             {" "}
-  
+
                             Current status:
-  
+
                             {" "}
-  
+
                             <strong className="text-capitalize">
-  
+
                               {
                                 application.status
                                   .replaceAll(
@@ -1064,12 +1303,12 @@ import {
                                     " "
                                   )
                               }
-  
+
                             </strong>
-  
+
                           </div>
-  
-  
+
+
                           <button
                             className="btn btn-outline-info"
                             type="button"
@@ -1079,18 +1318,18 @@ import {
                               )
                             }
                           >
-  
+
                             View Application
-  
+
                           </button>
-  
+
                         </div>
-  
+
                       ) : (
-  
-  
+
+
                         <div>
-  
+
                           <button
                             className="btn btn-info"
                             type="button"
@@ -1100,218 +1339,213 @@ import {
                               )
                             }
                           >
-  
+
                             {
                               applyingId
                               === item.id
                                 ? "Cancel Application"
                                 : "Apply"
                             }
-  
+
                           </button>
-  
-  
-  
+
+
                           {
                             applyingId
                             === item.id && (
-  
+
                               <div className="border rounded p-4 mt-3">
-  
-  
+
+
                                 <h3 className="h5 mb-3">
-  
+
                                   Apply to{" "}
-  
+
                                   {item.title}
-  
+
                                 </h3>
-  
-  
+
+
                                 <p className="text-secondary small">
-  
+
                                   SkillBeacon will capture a
                                   snapshot of your current profile,
                                   Skill Passport, and résumé
                                   availability when you submit.
-  
+
                                 </p>
-  
-  
-  
+
+
                                 <div className="mb-4">
-  
+
                                   <h4 className="h6">
                                     Current Profile
                                   </h4>
-  
-  
+
+
                                   {
                                     studentName && (
-  
+
                                       <p className="mb-1">
-  
+
                                         <strong>
                                           {studentName}
                                         </strong>
-  
+
                                       </p>
-  
+
                                     )
                                   }
-  
-  
+
+
                                   {
                                     studentProfile
                                       ?.headline && (
-  
+
                                       <p className="text-secondary mb-1">
-  
+
                                         {
                                           studentProfile
                                             .headline
                                         }
-  
+
                                       </p>
-  
+
                                     )
                                   }
-  
-  
+
+
                                   {
                                     studentProfile
                                       ?.summary && (
-  
+
                                       <p className="small text-secondary mb-0">
-  
+
                                         {
                                           studentProfile
                                             .summary
                                         }
-  
+
                                       </p>
-  
+
                                     )
                                   }
-  
+
                                 </div>
-  
-  
-  
+
+
                                 <div className="mb-4">
-  
+
                                   <h4 className="h6">
                                     Current Skills
                                   </h4>
-  
-  
+
+
                                   {
                                     mySkills.length
                                     === 0 ? (
-  
+
                                       <p className="small text-secondary">
-  
+
                                         No skills currently
                                         added to your Skill
                                         Passport.
-  
+
                                       </p>
-  
+
                                     ) : (
-  
+
                                       <div className="d-flex flex-wrap gap-2">
-  
+
                                         {
                                           mySkills.map(
                                             (
                                               userSkill
                                             ) => (
-  
+
                                               <span
                                                 key={
                                                   userSkill.id
                                                 }
                                                 className="badge text-bg-secondary"
                                               >
-  
+
                                                 {
                                                   userSkill
                                                     .skill
                                                     ?.name
                                                 }
-  
+
                                                 {" · "}
-  
+
                                                 {
                                                   userSkill
                                                     .level
                                                 }
-  
+
                                               </span>
-  
+
                                             )
                                           )
                                         }
-  
+
                                       </div>
-  
+
                                     )
                                   }
-  
+
                                 </div>
-  
-  
-  
+
+
                                 <div className="mb-4">
-  
+
                                   <h4 className="h6">
                                     Résumé
                                   </h4>
-  
-  
+
+
                                   {
                                     resumeAvailable ? (
-  
+
                                       <p className="small text-success mb-0">
-  
+
                                         ✓ Résumé available.
                                         Your current résumé
                                         will be associated with
                                         this application.
-  
+
                                       </p>
-  
+
                                     ) : (
-  
+
                                       <div className="alert alert-warning py-2 mb-0">
-  
+
                                         You do not currently
                                         have a résumé uploaded.
-  
+
                                         {" "}
-  
+
                                         You may still submit,
                                         but employers will not
                                         have a résumé to review.
-  
+
                                       </div>
-  
+
                                     )
                                   }
-  
+
                                 </div>
-  
-  
-  
+
+
                                 <div className="mb-3">
-  
+
                                   <label className="form-label">
-  
+
                                     Cover Letter
-  
+
                                   </label>
-  
-  
+
+
                                   <textarea
                                     rows="6"
                                     maxLength="5000"
@@ -1330,48 +1564,46 @@ import {
                                     }
                                     placeholder="Explain why you are interested in this opportunity and how your experience matches the role..."
                                   />
-  
-  
+
+
                                   <div className="form-text d-flex justify-content-between">
-  
+
                                     <span>
                                       Optional
                                     </span>
-  
-  
+
+
                                     <span>
-  
+
                                       {
                                         coverLetter.length
                                       }
-  
+
                                       /5000
-  
+
                                     </span>
-  
+
                                   </div>
-  
+
                                 </div>
-  
-  
-  
+
+
                                 <div className="alert alert-info small">
-  
+
                                   By submitting, a historical
                                   snapshot of your profile and
                                   current skills will be saved
                                   with this application.
-  
+
                                   Future profile changes will
                                   not rewrite the submitted
                                   application snapshot.
-  
+
                                 </div>
-  
-  
-  
+
+
                                 <div className="d-flex gap-2">
-  
+
                                   <button
                                     className="btn btn-success"
                                     type="button"
@@ -1384,16 +1616,16 @@ import {
                                       )
                                     }
                                   >
-  
+
                                     {
                                       submitting
                                         ? "Submitting..."
                                         : "Confirm Application"
                                     }
-  
+
                                   </button>
-  
-  
+
+
                                   <button
                                     className="btn btn-outline-secondary"
                                     type="button"
@@ -1406,30 +1638,29 @@ import {
                                       )
                                     }
                                   >
-  
+
                                     Cancel
-  
+
                                   </button>
-  
+
                                 </div>
-  
+
                               </div>
-  
+
                             )
                           }
-  
+
                         </div>
-  
+
                       )
                     }
-  
-  
-  
+
+
                     {
                       item.application_url && (
-  
+
                         <div className="mt-3">
-  
+
                           <a
                             href={
                               item.application_url
@@ -1438,26 +1669,445 @@ import {
                             rel="noreferrer"
                             className="btn btn-outline-secondary btn-sm"
                           >
-  
+
                             External Application Link
-  
+
                           </a>
-  
+
                         </div>
-  
+
                       )
                     }
-  
+
                   </div>
-  
+
                 </div>
-  
+
               );
-  
             }
           )
         }
-  
-      </>
-    );
-  }
+
+      </div>
+
+
+      {/* ================================== */}
+      {/* NEW: EXTERNAL OPPORTUNITIES */}
+      {/* ================================== */}
+
+      <div className="mt-5">
+
+        <div
+          className="
+            d-flex
+            justify-content-between
+            align-items-center
+            flex-wrap
+            gap-3
+            mb-3
+          "
+        >
+
+          <div>
+
+            <p
+              className="
+                text-info
+                fw-semibold
+                text-uppercase
+                small
+                mb-1
+              "
+            >
+              Amazon Jobs
+            </p>
+
+
+            <h2 className="h3 mb-1">
+              Recent Amazon Opportunities
+            </h2>
+
+
+            <p className="text-secondary mb-0">
+              Recent jobs synchronized directly
+              from Amazon Jobs.
+            </p>
+
+          </div>
+
+
+          {!externalLoading && (
+
+            <span
+              className="
+                badge
+                rounded-pill
+                text-bg-secondary
+              "
+            >
+              {externalTotal} jobs
+            </span>
+
+          )}
+
+        </div>
+
+
+        {/* External API error should not hide
+            SkillBeacon opportunities */}
+
+        {externalError && (
+
+          <div className="alert alert-warning">
+
+            <strong>
+              External opportunities unavailable.
+            </strong>
+
+            {" "}
+
+            {externalError}
+
+          </div>
+
+        )}
+
+
+        {externalLoading && (
+
+          <p className="text-secondary">
+            Loading external opportunities...
+          </p>
+
+        )}
+
+
+        {
+          !externalLoading &&
+          !externalError &&
+          externalJobs.length === 0 && (
+
+            <div className="glass-card">
+
+              <p className="text-secondary mb-0">
+                No external jobs are currently available.
+              </p>
+
+            </div>
+
+          )
+        }
+
+
+        {
+          !externalLoading &&
+          externalJobs.map(
+            (job) => (
+
+              <div
+                key={
+                  `external-${job.id}`
+                }
+                className="glass-card mb-4"
+              >
+
+
+                <div
+                  className="
+                    d-flex
+                    justify-content-between
+                    gap-3
+                    flex-wrap
+                  "
+                >
+
+                  <div>
+
+                    <div
+                      className="
+                        d-flex
+                        align-items-center
+                        flex-wrap
+                        gap-2
+                        mb-2
+                      "
+                    >
+
+                      <span
+                        className="
+                          badge
+                          rounded-pill
+                          text-bg-primary
+                        "
+                      >
+                        External
+                      </span>
+
+
+                      {job.employment_type && (
+
+                        <span
+                          className="
+                            badge
+                            rounded-pill
+                            text-bg-secondary
+                            text-capitalize
+                          "
+                        >
+                          {
+                            job.employment_type
+                              .replaceAll(
+                                "_",
+                                " "
+                              )
+                          }
+                        </span>
+
+                      )}
+
+
+                      {job.workplace_type && (
+
+                        <span
+                          className="
+                            badge
+                            rounded-pill
+                            text-bg-info
+                            text-capitalize
+                          "
+                        >
+                          {
+                            job.workplace_type
+                              .replaceAll(
+                                "_",
+                                " "
+                              )
+                          }
+                        </span>
+
+                      )}
+
+                    </div>
+
+
+                    <h2 className="h4 mb-1">
+
+                      {job.title}
+
+                    </h2>
+
+
+                    <p className="text-secondary mb-1">
+
+                      {
+                        job.company_name
+                      }
+
+                    </p>
+
+
+                    {job.department && (
+
+                      <p className="small text-secondary mb-0">
+
+                        {
+                          job.department
+                        }
+
+                      </p>
+
+                    )}
+
+                  </div>
+
+                </div>
+
+
+                <hr />
+
+
+                <div className="row small mb-3">
+
+
+                  <div className="col-md-4 mb-3 mb-md-0">
+
+                    <span className="text-secondary">
+                      Location
+                    </span>
+
+
+                    <div>
+
+                      {
+                        job.location
+                        || "Not specified"
+                      }
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="col-md-4 mb-3 mb-md-0">
+
+                    <span className="text-secondary">
+                      Employment
+                    </span>
+
+
+                    <div className="text-capitalize">
+
+                      {
+                        job.employment_type
+                          ?.replaceAll(
+                            "_",
+                            " "
+                          )
+                        || "Not specified"
+                      }
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="col-md-4">
+
+                    <span className="text-secondary">
+                      Posted
+                    </span>
+
+
+                    <div>
+
+                      {
+                        job.posted_at
+                          ? new Date(
+                              job.posted_at
+                            ).toLocaleDateString()
+                          : "Not specified"
+                      }
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                {job.description && (
+
+                  <div className="mt-3">
+
+                    <h3 className="h6">
+                      Description
+                    </h3>
+
+
+                    <p
+                      className="
+                        text-secondary
+                        mb-0
+                      "
+                      style={{
+                        whiteSpace:
+                          "pre-line",
+                      }}
+                    >
+
+                      {
+                        truncateDescription(
+                          job.description
+                        )
+                      }
+
+                    </p>
+
+                  </div>
+
+                )}
+
+
+                <div
+                  className="
+                    d-flex
+                    flex-wrap
+                    gap-2
+                    mt-4
+                  "
+                >
+
+                  <a
+                    href={
+                      job.apply_url
+                      || job.job_url
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-info"
+                  >
+
+                    Apply on {
+                      job.company_name
+                    }
+
+                  </a>
+
+
+                  {
+                    job.job_url &&
+                    job.apply_url &&
+                    job.job_url
+                    !== job.apply_url && (
+
+                      <a
+                        href={
+                          job.job_url
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        className="
+                          btn
+                          btn-outline-secondary
+                        "
+                      >
+
+                        View Job
+
+                      </a>
+
+                    )
+                  }
+
+                </div>
+
+
+                <p
+                  className="
+                    small
+                    text-secondary
+                    mt-3
+                    mb-0
+                  "
+                >
+
+                  This opportunity is hosted
+                  externally. Application and
+                  hiring are handled directly
+                  by {
+                    job.company_name
+                  }.
+
+                </p>
+
+              </div>
+
+            )
+          )
+        }
+
+      </div>
+
+    </>
+  );
+}

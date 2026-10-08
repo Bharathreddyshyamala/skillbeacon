@@ -47,6 +47,9 @@ from app.models.document import (
     Document,
     DocumentType,
 )
+
+from app.models.job_source import JobSource
+from app.models.external_job import ExternalJob
 from app.models.notification import Notification
 from app.models.admin_audit_log import AdminAuditLog
 from app.models.sample_data import (

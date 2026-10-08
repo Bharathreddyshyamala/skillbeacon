@@ -1,6 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List,Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     debug: bool = True
 
     database_url: str
-    database_url_unpooled: str | None = None
+    database_url_unpooled: Optional[str] = None
 
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"

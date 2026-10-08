@@ -12,6 +12,13 @@ from app.api.routes.skill_routes import router as skill_router
 from app.api.routes.notification_routes import router as notifications_router
 from app.api.routes.admin_routes import router as admin_router
 from app.api.routes.sample_data_routes import router as sample_data_router
+from app.api.routes.admin_job_ingestion import (
+    router as admin_job_ingestion_router,
+)
+
+from app.api.routes.external_jobs import (
+    router as external_jobs_router,
+)
 
 
 api_router = APIRouter()
@@ -28,3 +35,5 @@ api_router.include_router(document_router)
 api_router.include_router(notifications_router)
 api_router.include_router(admin_router)
 api_router.include_router(sample_data_router)
+api_router.include_router(admin_job_ingestion_router)
+api_router.include_router(external_jobs_router)
