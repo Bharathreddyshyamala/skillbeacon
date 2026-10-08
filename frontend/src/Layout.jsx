@@ -29,6 +29,7 @@ export default function Layout() {
     setUnreadNotifications,
   ] = useState(0);
 
+
   async function handleLogout() {
     await logout();
 
@@ -39,6 +40,11 @@ export default function Layout() {
       }
     );
   }
+
+
+  /*
+   * Role-based navigation permissions
+   */
 
   const canManageSkills =
     user?.role === "student" ||
@@ -77,6 +83,11 @@ export default function Layout() {
   const canViewNotifications =
     Boolean(user);
 
+
+  /*
+   * Notifications
+   */
+
   async function loadUnreadNotifications() {
     if (!user) {
       setUnreadNotifications(0);
@@ -101,6 +112,7 @@ export default function Layout() {
       setUnreadNotifications(0);
     }
   }
+
 
   useEffect(
     () => {
@@ -131,10 +143,19 @@ export default function Layout() {
     ]
   );
 
+
   return (
     <div className="app-shell">
 
-      <nav className="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
+      <nav
+        className="
+          navbar
+          navbar-expand-lg
+          navbar-dark
+          app-navbar
+          sticky-top
+        "
+      >
 
         <div className="container">
 
@@ -144,6 +165,7 @@ export default function Layout() {
           >
             SkillBeacon
           </NavLink>
+
 
           <button
             className="navbar-toggler"
@@ -157,12 +179,18 @@ export default function Layout() {
             <span className="navbar-toggler-icon" />
           </button>
 
+
           <div
-            className="collapse navbar-collapse"
+            className="
+              collapse
+              navbar-collapse
+            "
             id="navMenu"
           >
 
             <div className="navbar-nav me-auto">
+
+              {/* Common Dashboard */}
 
               <NavLink
                 className="nav-link"
@@ -170,6 +198,9 @@ export default function Layout() {
               >
                 Dashboard
               </NavLink>
+
+
+              {/* Profile */}
 
               {canViewProfile && (
                 <NavLink
@@ -180,6 +211,9 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
+              {/* Skills */}
+
               {canManageSkills && (
                 <NavLink
                   className="nav-link"
@@ -188,6 +222,9 @@ export default function Layout() {
                   Skills
                 </NavLink>
               )}
+
+
+              {/* Student Opportunities */}
 
               {canBrowseOpportunities && (
                 <NavLink
@@ -198,6 +235,9 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
+              {/* Student Applications */}
+
               {canViewApplications && (
                 <NavLink
                   className="nav-link"
@@ -206,6 +246,9 @@ export default function Layout() {
                   Applications
                 </NavLink>
               )}
+
+
+              {/* Mentorship */}
 
               {canUseMentorships && (
                 <NavLink
@@ -216,6 +259,9 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
+              {/* Student Challenges */}
+
               {canBrowseChallenges && (
                 <NavLink
                   className="nav-link"
@@ -224,6 +270,9 @@ export default function Layout() {
                   Challenges
                 </NavLink>
               )}
+
+
+              {/* Employer Opportunities */}
 
               {canManageOpportunities && (
                 <NavLink
@@ -234,6 +283,9 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
+              {/* Employer Challenges */}
+
               {canManageChallenges && (
                 <NavLink
                   className="nav-link"
@@ -242,6 +294,9 @@ export default function Layout() {
                   Manage Challenges
                 </NavLink>
               )}
+
+
+              {/* Mentor Evidence Verification */}
 
               {canVerifyEvidence && (
                 <NavLink
@@ -252,6 +307,11 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
+              {/* ====================== */}
+              {/* ADMIN NAVIGATION */}
+              {/* ====================== */}
+
               {canUseAdmin && (
                 <NavLink
                   className="nav-link"
@@ -260,6 +320,7 @@ export default function Layout() {
                   Admin
                 </NavLink>
               )}
+
 
               {canUseAdmin && (
                 <NavLink
@@ -270,6 +331,7 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
               {canUseAdmin && (
                 <NavLink
                   className="nav-link"
@@ -278,6 +340,7 @@ export default function Layout() {
                   Moderation
                 </NavLink>
               )}
+
 
               {canUseAdmin && (
                 <NavLink
@@ -288,6 +351,7 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
               {canUseAdmin && (
                 <NavLink
                   className="nav-link"
@@ -297,9 +361,28 @@ export default function Layout() {
                 </NavLink>
               )}
 
+
+              {/* NEW: External Job Ingestion */}
+
+              {canUseAdmin && (
+                <NavLink
+                  className="nav-link"
+                  to="/app/admin/job-ingestion"
+                >
+                  Job Ingestion
+                </NavLink>
+              )}
+
+
+              {/* Notifications */}
+
               {canViewNotifications && (
                 <NavLink
-                  className="nav-link d-flex align-items-center"
+                  className="
+                    nav-link
+                    d-flex
+                    align-items-center
+                  "
                   to="/app/notifications"
                 >
 
@@ -309,7 +392,12 @@ export default function Layout() {
 
                   {unreadNotifications > 0 && (
                     <span
-                      className="badge rounded-pill bg-danger ms-2"
+                      className="
+                        badge
+                        rounded-pill
+                        bg-danger
+                        ms-2
+                      "
                       title={
                         `${unreadNotifications} unread notification${
                           unreadNotifications !== 1
@@ -331,24 +419,52 @@ export default function Layout() {
 
             </div>
 
-            <div className="d-flex align-items-center gap-3">
 
-              <span className="small text-secondary d-none d-md-inline">
+            {/* Logged-in user */}
+
+            <div
+              className="
+                d-flex
+                align-items-center
+                gap-3
+              "
+            >
+
+              <span
+                className="
+                  small
+                  text-secondary
+                  d-none
+                  d-md-inline
+                "
+              >
 
                 {user?.email}
 
                 {" · "}
 
-                <span className="text-info text-capitalize">
+                <span
+                  className="
+                    text-info
+                    text-capitalize
+                  "
+                >
                   {user?.role}
                 </span>
 
               </span>
 
+
               <button
-                className="btn btn-outline-light btn-sm"
+                className="
+                  btn
+                  btn-outline-light
+                  btn-sm
+                "
                 type="button"
-                onClick={handleLogout}
+                onClick={
+                  handleLogout
+                }
               >
                 Log out
               </button>
@@ -360,6 +476,7 @@ export default function Layout() {
         </div>
 
       </nav>
+
 
       <main className="container py-5">
         <Outlet />
